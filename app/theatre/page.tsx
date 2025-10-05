@@ -510,7 +510,7 @@ export default function TheatrePage() {
           onClick={() => handleImageClick('security-camera')}
         >
           <Image
-            src="/security Camera.PNG"
+            src="/camerafixed.PNG"
             alt="Security Camera"
             width={3840}
             height={3840}
