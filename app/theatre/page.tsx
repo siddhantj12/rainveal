@@ -219,7 +219,7 @@ export default function TheatrePage() {
             {/* Broken Images - revealed in sequence */}
             {/* Broken Image 1 */}
             <div
-              className={`absolute top-1/4 left-1/4 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
+              className={`absolute top-1/4 left-1/4 w-64 h-64 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
                 revealedBrokenImages.has(1) ? 'opacity-100' : 'opacity-0'
               } ${isShaking ? 'animate-bounce' : ''}`}
               onClick={() => handleBrokenImageClick(1)}
@@ -227,15 +227,15 @@ export default function TheatrePage() {
               <Image
                 src="/Broken 1.PNG"
                 alt="Broken Clue 1"
-                width={192}
-                height={192}
-                className="object-contain"
+                width={256}
+                height={256}
+                className="object-contain w-full h-full"
               />
             </div>
 
             {/* Broken Image 2 */}
             <div
-              className={`absolute top-1/3 right-1/4 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
+              className={`absolute top-1/3 right-1/4 w-64 h-64 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
                 revealedBrokenImages.has(2) ? 'opacity-100' : 'opacity-0'
               } ${isShaking ? 'animate-spin' : ''}`}
               onClick={() => handleBrokenImageClick(2)}
@@ -243,15 +243,15 @@ export default function TheatrePage() {
               <Image
                 src="/Broken 2.PNG"
                 alt="Broken Clue 2"
-                width={192}
-                height={192}
-                className="object-contain"
+                width={256}
+                height={256}
+                className="object-contain w-full h-full"
               />
             </div>
 
             {/* Broken Image 3 */}
             <div
-              className={`absolute bottom-1/4 left-1/2 -translate-x-1/2 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
+              className={`absolute bottom-1/4 left-1/2 -translate-x-1/2 w-64 h-64 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
                 revealedBrokenImages.has(3) ? 'opacity-100' : 'opacity-0'
               } ${isShaking ? 'animate-pulse' : ''}`}
               onClick={() => handleBrokenImageClick(3)}
@@ -259,9 +259,9 @@ export default function TheatrePage() {
               <Image
                 src="/Broken 3.PNG"
                 alt="Broken Clue 3"
-                width={192}
-                height={192}
-                className="object-contain"
+                width={256}
+                height={256}
+                className="object-contain w-full h-full"
               />
             </div>
           </div>
