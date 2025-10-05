@@ -64,16 +64,12 @@ export default function TheatrePage() {
     if (audioContext.state !== 'running') {
       console.log('Audio context not running, attempting to resume...')
       resumeAudioContext().then(() => {
-        if (audioEnabled) {
-          playSoundInternal(frequency, duration, type)
-        }
+        playSoundInternal(frequency, duration, type)
       })
       return
     }
 
-    if (audioEnabled) {
-      playSoundInternal(frequency, duration, type)
-    }
+    playSoundInternal(frequency, duration, type)
   }
 
   const playSoundInternal = (frequency: number, duration: number, type: OscillatorType) => {
@@ -130,7 +126,15 @@ export default function TheatrePage() {
   // Mysterious detective/noir background music track
   const playBackgroundMusic = () => {
     const audioContext = getAudioContext()
-    if (!audioContext || !audioEnabled) return
+    if (!audioContext) {
+      console.log('Cannot play background music: no audio context')
+      return
+    }
+    
+    if (audioContext.state !== 'running') {
+      console.log('Audio context not running, cannot play background music')
+      return
+    }
 
     // Stop any existing background music
     stopBackgroundMusic()
@@ -289,31 +293,106 @@ export default function TheatrePage() {
 
   // Start background music and show detective greeting when entering the theatre
   useEffect(() => {
-    // Show detective greeting after a short delay
-    const greetingTimer = setTimeout(() => {
-      setShowGreeting(true)
-      playAhaSound()
-      
-      // Auto-hide greeting after 5 seconds
-      setTimeout(() => {
-        setShowGreeting(false)
-      }, 5000)
-    }, 1500)
+    // Check if user has already seen the greeting
+    const hasSeenGreeting = sessionStorage.getItem('theatre-greeting-shown')
+    
+    // Show detective greeting only on first visit from weather app
+    if (!hasSeenGreeting) {
+      const greetingTimer = setTimeout(async () => {
+        setShowGreeting(true)
+        sessionStorage.setItem('theatre-greeting-shown', 'true')
+        
+        // Try to play AHA sound - will work if user has interacted
+        const audioContext = getAudioContext()
+        if (audioContext) {
+          // Resume audio context if needed
+          if (audioContext.state === 'suspended') {
+            try {
+              await audioContext.resume()
+              console.log('Audio context resumed for AHA sound')
+            } catch (error) {
+              console.log('Could not resume audio context for AHA:', error)
+            }
+          }
+          
+          // Play AHA sound
+          if (audioContext.state === 'running') {
+            console.log('Playing AHA sound')
+            playAhaSound()
+          } else {
+            console.log('Audio context not running, AHA sound skipped')
+          }
+        }
+      }, 1500)
 
-    // Small delay to allow user to enable audio first
-    const musicTimer = setTimeout(() => {
-      if (audioEnabled) {
-        playBackgroundMusic()
+      // Cleanup greeting timer
+      return () => {
+        clearTimeout(greetingTimer)
       }
-    }, 1000)
+    }
+  }, [])
+
+  // Auto-play background music when page loads
+  useEffect(() => {
+    let audioInitialized = false
+
+    // Enable audio on first user interaction
+    const enableAudioOnInteraction = async () => {
+      if (audioInitialized) return
+      audioInitialized = true
+
+      console.log('Enabling audio...')
+      const audioContext = getAudioContext()
+      
+      if (!audioContext) {
+        console.log('No audio context available')
+        return
+      }
+
+      try {
+        if (audioContext.state === 'suspended') {
+          console.log('Resuming audio context...')
+          await audioContext.resume()
+        }
+        
+        console.log('Audio context state:', audioContext.state)
+        setAudioEnabled(true)
+        
+        // If greeting is showing, play AHA sound now
+        if (showGreeting) {
+          console.log('Playing AHA sound after user interaction')
+          playAhaSound()
+        }
+        
+        // Start background music after enabling audio
+        setTimeout(() => {
+          console.log('Starting background music...')
+          playBackgroundMusic()
+        }, 800)
+      } catch (error) {
+        console.error('Failed to enable audio:', error)
+      }
+    }
+
+    // Listen for any user interaction to enable audio
+    const handleInteraction = () => {
+      console.log('User interaction detected')
+      enableAudioOnInteraction()
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleInteraction)
+      document.removeEventListener('keydown', handleInteraction)
+    }
+
+    document.addEventListener('click', handleInteraction)
+    document.addEventListener('keydown', handleInteraction)
 
     // Cleanup: stop music when leaving the page
     return () => {
-      clearTimeout(greetingTimer)
-      clearTimeout(musicTimer)
+      document.removeEventListener('click', handleInteraction)
+      document.removeEventListener('keydown', handleInteraction)
       stopBackgroundMusic()
     }
-  }, [audioEnabled])
+  }, [showGreeting])
 
   return (
     <div className="min-h-screen theatre-gradient relative overflow-hidden">
@@ -477,47 +556,6 @@ export default function TheatrePage() {
         )}
       </div>
 
-      {/* Audio Controls */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-        {!audioEnabled && (
-          <button
-            onClick={() => resumeAudioContext()}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-300 hover:scale-110"
-            title="Enable Audio & Music"
-          >
-            <Volume2 className="w-6 h-6" />
-          </button>
-        )}
-
-        {/* Music control button */}
-        {audioEnabled && (
-          <button
-            onClick={() => {
-              if (backgroundMusicRef.current) {
-                stopBackgroundMusic()
-              } else {
-                playBackgroundMusic()
-              }
-            }}
-            className="bg-purple-500/20 hover:bg-purple-500/30 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-300 hover:scale-110"
-            title={backgroundMusicRef.current ? "Stop Background Music" : "Play Background Music"}
-          >
-            <Music className="w-6 h-6" />
-          </button>
-        )}
-
-        {/* Audio Test Button */}
-        <button
-          onClick={() => {
-            console.log('Testing audio...')
-            playSound(440, 500, 'sine') // A4 note
-          }}
-          className="bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm rounded-full p-2 text-white text-xs transition-all duration-300 hover:scale-110"
-          title="Test Audio (A4 440Hz)"
-        >
-          🔊
-        </button>
-      </div>
 
       {/* Detective Greeting Popup */}
       {showGreeting && (

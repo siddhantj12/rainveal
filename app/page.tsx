@@ -221,30 +221,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Audio Controls */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-        {!audioEnabled && (
-          <button
-            onClick={() => resumeAudioContext()}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-300 hover:scale-110"
-            title="Enable Audio"
-          >
-            <Volume2 className="w-6 h-6" />
-          </button>
-        )}
-
-        {/* Audio Test Button */}
-        <button
-          onClick={() => {
-            console.log('Testing audio...')
-            playSound(440, 500, 'sine') // A4 note
-          }}
-          className="bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm rounded-full p-2 text-white text-xs transition-all duration-300 hover:scale-110"
-          title="Test Audio (A4 440Hz)"
-        >
-          🔊
-        </button>
-      </div>
     </main>
   )
 }
