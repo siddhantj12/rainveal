@@ -150,6 +150,8 @@ export default function PianoCloseupPage() {
               localStorage.setItem("case-001:clues", JSON.stringify(found))
             }
           } catch {}
+          // Navigate to the piano note scene after a short delay
+          setTimeout(() => router.push('/piano-scroll/scene/piano-note'), 600)
         }
       }
       return next
