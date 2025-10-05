@@ -202,43 +202,11 @@ export default function TheatrePage() {
           )}
         </div>
 
-        {/* Audience Seats with Inspector Gemini */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-4xl">
-          <div className="audience-seats grid grid-cols-7 gap-2 relative">
-            {Array.from({ length: 21 }).map((_, i) => (
-              <div key={i} className={`seat w-full h-16 bg-gradient-to-b from-red-700 to-red-900 rounded-t-lg shadow-lg transition-all duration-300 hover:scale-105 ${
-                i === 10 ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
-              }`} />
-            ))}
-
-            {/* Inspector Gemini - positioned in center audience seat */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20">
-              <div className="relative">
-                {/* Detective silhouette */}
-                <div className="w-12 h-16 bg-gradient-to-b from-gray-800 to-black rounded-t-full shadow-lg"></div>
-                {/* Detective head */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-gradient-to-b from-amber-200 to-amber-400 rounded-full shadow-md"></div>
-                {/* Detective hat */}
-                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-6 h-3 bg-gradient-to-b from-gray-700 to-black rounded-full shadow-sm"></div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="mt-12 text-center relative">
         <h1 className="text-4xl font-bold text-white mb-4 text-balance">Welcome to the Theatre</h1>
         <p className="text-white/80 text-lg">You found the secret performance hall!</p>
-
-        {/* Mystery Clue */}
-        <div className="mt-6 max-w-md mx-auto">
-          <div className="glass rounded-xl p-4 text-center">
-            <div className="text-yellow-400 text-sm font-medium mb-2">🎭 Theatre Mystery</div>
-            <p className="text-white/90 text-sm">
-              Something mysterious is happening in this theatre. Inspector Gemini is here to help you investigate...
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Audio Controls */}
