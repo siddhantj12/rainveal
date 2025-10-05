@@ -90,7 +90,17 @@ export function WeatherCard({
             ? 'hover:bg-yellow-500/20 hover:shadow-[0_0_30px_rgba(250,204,21,0.4)] cursor-pointer ring-2 ring-yellow-400/50' 
             : ''
         }`}
-        {...(uvUnlocked && isUV ? { onClick: () => setShowCallSheet(true), role: 'button', 'aria-label': 'Reveal the truth' } : {})}
+        {...(uvUnlocked && isUV ? { 
+          onClick: () => {
+            setShowCallSheet(true);
+            // Mark that player has viewed the call sheet
+            try {
+              localStorage.setItem('rainveal:call-sheet-viewed', '1');
+            } catch {}
+          }, 
+          role: 'button', 
+          'aria-label': 'Reveal the truth' 
+        } : {})}
       >
         <div className="flex items-center gap-2 mb-4 text-white/70">
           {uvIcon}
@@ -109,7 +119,13 @@ export function WeatherCard({
       {showCallSheet && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setShowCallSheet(false)}
+          onClick={() => {
+            setShowCallSheet(false);
+            // Mark that player has viewed the call sheet
+            try {
+              localStorage.setItem('rainveal:call-sheet-viewed', '1');
+            } catch {}
+          }}
         >
           <div
             className="relative bg-amber-50 text-black max-w-2xl w-[90vw] p-8 rounded-lg shadow-2xl animate-in fade-in zoom-in duration-300"
@@ -117,7 +133,13 @@ export function WeatherCard({
             style={{ fontFamily: 'Courier New, monospace' }}
           >
             <button
-              onClick={() => setShowCallSheet(false)}
+              onClick={() => {
+                setShowCallSheet(false);
+                // Mark that player has viewed the call sheet
+                try {
+                  localStorage.setItem('rainveal:call-sheet-viewed', '1');
+                } catch {}
+              }}
               className="absolute top-4 right-4 p-2 hover:bg-black/10 rounded-full transition"
               aria-label="Close"
             >

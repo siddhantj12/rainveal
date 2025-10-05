@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { 
@@ -32,6 +33,9 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [chatMode, setChatMode] = useState<'investigation' | 'submission'>('investigation');
+  const [hasSeenCallSheet, setHasSeenCallSheet] = useState(false);
+  const [caseSolved, setCaseSolved] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -78,6 +82,13 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
     }
   }, [isOpen, isMinimized]);
 
+  // Check if player has seen the call sheet
+  useEffect(() => {
+    try {
+      setHasSeenCallSheet(localStorage.getItem('rainveal:call-sheet-viewed') === '1');
+    } catch {}
+  }, [isOpen]); // Check when chat opens
+
   const sendMessage = async (content: string) => {
     if (!content.trim() || isLoading) return;
 
@@ -104,7 +115,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
         body: JSON.stringify({
           message: content.trim(),
           caseId: 'theatre-case',
-          mode: 'chat',
+          mode: chatMode === 'submission' ? 'case-submission' : 'chat',
           conversationHistory: messages.slice(-10),
           scene: 'Theatre Performance Hall',
           phase: 'Initial exploration',
@@ -134,6 +145,29 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Check if Captain Claude declares the case solved
+      const responseText = data.response.toLowerCase();
+      const solvedPhrases = [
+        "you've solved it completely",
+        "you've solved it",
+        "case solved",
+        "correct. you've solved",
+        "you solved it",
+        "you saw through every layer",
+        "well done, detective",
+        "congratulations, detective"
+      ];
+      
+      const isSolved = chatMode === 'submission' && solvedPhrases.some(phrase => responseText.includes(phrase));
+      
+      console.log('Captain Claude response:', data.response);
+      console.log('Is case solved?', isSolved);
+      
+      if (isSolved) {
+        console.log('🎉 CASE SOLVED! Showing end screen...');
+        setCaseSolved(true);
+      }
     } catch (error) {
       let errorContent = 'Sorry, I encountered an error. Please try again.';
 
@@ -162,9 +196,60 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
     setMessages([]);
   };
 
+  const handleSubmitCase = () => {
+    setChatMode('submission');
+    setMessages([]);
+    const welcomeMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: '🎖️ **Captain Claude here.**\n\nInspector Gemini has forwarded your case file to me for review. I understand you have a theory regarding the Aurelia Moreau investigation.\n\nPlease present your findings:\n• Your theory about what occurred\n• Key evidence you uncovered\n• Any suspects or motives\n• Your conclusions\n\nI will evaluate your work carefully. Proceed when ready.',
+      timestamp: new Date()
+    };
+    setMessages([welcomeMessage]);
+  };
+
+  const handleBackToInvestigation = () => {
+    setChatMode('investigation');
+    setMessages([]);
+  };
+
   return (
-    <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 ${className}`}>
-      {/* Chat Button */}
+    <>
+      {/* Game End Screen */}
+      {caseSolved && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-md">
+          <div className="relative max-w-4xl w-[95vw] animate-in fade-in zoom-in duration-500">
+            <div className="text-center space-y-6">
+              {/* Success Badge Image */}
+              <div className="relative w-full max-w-3xl mx-auto">
+                <Image 
+                  src="/success-badge.PNG" 
+                  alt="Congrats on Solving the Mystery Case" 
+                  width={1200}
+                  height={800}
+                  className="w-full h-auto object-contain"
+                  priority
+                />
+              </div>
+              
+              <button
+                onClick={() => {
+                  setCaseSolved(false);
+                  setIsOpen(false);
+                  setChatMode('investigation');
+                  setMessages([]);
+                }}
+                className="bg-red-600 hover:bg-red-500 text-white font-bold px-8 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 ${className}`}>
+        {/* Chat Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -192,7 +277,9 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           <div className="flex items-center justify-between p-4 border-b border-gray-600 bg-black text-white rounded-t-lg">
             <div className="flex items-center gap-2">
               <Bot className="w-5 h-5 text-gray-300" />
-              <span className="font-semibold text-white">Inspector Gemini</span>
+              <span className="font-semibold text-white">
+                {chatMode === 'submission' ? 'Captain Claude' : 'Inspector Gemini'}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <Button
@@ -219,34 +306,67 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
               {/* Quick Actions */}
               <div className="p-3 border-b border-gray-600 bg-gray-900">
                 <div className="flex gap-2 flex-wrap">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => sendMessage("Tell me about this theatre case")}
-                    disabled={isLoading}
-                    className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
-                  >
-                    <MessageCircle className="w-3 h-3 mr-1" />
-                    Case Info
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => sendMessage("Give me a hint about the mystery")}
-                    disabled={isLoading}
-                    className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
-                  >
-                    <Bot className="w-3 h-3 mr-1" />
-                    Hint
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={clearChat}
-                    className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
-                  >
-                    Clear
-                  </Button>
+                  {chatMode === 'investigation' ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => sendMessage("Tell me about this theatre case")}
+                        disabled={isLoading}
+                        className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+                      >
+                        <MessageCircle className="w-3 h-3 mr-1" />
+                        Case Info
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => sendMessage("Give me a hint about the mystery")}
+                        disabled={isLoading}
+                        className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+                      >
+                        <Bot className="w-3 h-3 mr-1" />
+                        Hint
+                      </Button>
+                      {hasSeenCallSheet && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleSubmitCase}
+                          className="text-xs text-yellow-300 border-yellow-600 bg-yellow-900/30 hover:bg-yellow-800/50 hover:text-yellow-200 hover:border-yellow-500 font-semibold"
+                        >
+                          📋 Submit Case
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={clearChat}
+                        className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+                      >
+                        Clear
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBackToInvestigation}
+                        className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+                      >
+                        ← Back to Investigation
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={clearChat}
+                        className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+                      >
+                        Clear
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -306,7 +426,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                     ref={inputRef}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Ask Inspector Gemini about the mystery..."
+                    placeholder={chatMode === 'submission' ? "Present your case to Captain Claude..." : "Ask Inspector Gemini about the mystery..."}
                     disabled={isLoading}
                     className="flex-1 bg-gray-800 text-white placeholder-gray-400 border-gray-600 focus:border-gray-500 focus:ring-gray-500"
                   />
@@ -323,6 +443,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
