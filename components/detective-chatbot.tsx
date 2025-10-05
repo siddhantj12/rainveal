@@ -163,7 +163,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
   };
 
   return (
-    <div className={`fixed bottom-4 right-4 z-50 ${className}`}>
+    <div className={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 ${className}`}>
       {/* Chat Button */}
       {!isOpen && (
         <button
@@ -173,11 +173,11 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           <img 
             src="/detective.png" 
             alt="Detective Chat" 
-            className="w-16 h-16 object-contain hover:scale-110 transition-transform duration-200"
+            className="w-20 h-20 object-contain hover:scale-110 transition-transform duration-200"
             onError={(e) => {
               // Fallback to emoji if image doesn't exist
               e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.innerHTML = '<div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white text-2xl">🕵️</div>';
+              e.currentTarget.parentElement!.innerHTML = '<div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white text-2xl">🕵️</div>';
             }}
           />
         </button>
