@@ -174,6 +174,19 @@ export default function Home() {
     <main className="min-h-screen relative overflow-hidden">
       <div className="fixed inset-0 -z-10 weather-gradient" />
 
+      {/* Audio Enable Prompt - appears briefly on load */}
+      {!audioEnabled && (
+        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top duration-500">
+          <button
+            onClick={() => resumeAudioContext()}
+            className="glass rounded-2xl px-6 py-3 text-white hover:bg-white/30 transition-all duration-300 flex items-center gap-2 shadow-lg"
+          >
+            <Volume2 className="w-5 h-5" />
+            <span className="text-sm font-medium">Enable Sound</span>
+          </button>
+        </div>
+      )}
+
       {/* Weather App Content with Fade Effect */}
       <div className={`transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
         <div className="cloud cloud-1" />
