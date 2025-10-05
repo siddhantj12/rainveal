@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if API key is available
-    const apiKey = process.env.GEMINI_API_KEY || 'AIzaSyB6avypaqsCZ4zYePQ5phF2cVpl2CPiYr8';
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: 'GEMINI_API_KEY environment variable is required' },
+        { error: 'GEMINI_API_KEY environment variable is required. Please configure it in your deployment environment.' },
         { status: 500 }
       );
     }

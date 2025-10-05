@@ -34,10 +34,26 @@
 ### Deployment Configuration
 - ✅ Optimized Next.js build configuration
 - ✅ Static page generation for performance
-- ✅ API routes for weather data
+- ✅ API routes for weather data and AI chat
 - ✅ Proper security headers
 - ✅ Audio context handling for sound effects
 - ✅ Vercel.json configuration for optimal deployment
+
+### Environment Variables Setup
+
+**Required for Chatbot Functionality:**
+1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Create a new API key for Gemini API
+3. In your **Vercel Dashboard**:
+   - Go to your project → Settings → Environment Variables
+   - Add environment variable: `GEMINI_API_KEY`
+   - Set the value to your API key
+   - Ensure it's set for all environments (Production, Preview, Development)
+
+**⚠️ Important Notes:**
+- Environment variables are configured in **Vercel Dashboard**, not in `vercel.json`
+- The chatbot will show "Inspector Gemini is currently offline" if no API key is configured
+- All other features (weather, audio, theatre animations) work without the API key
 
 ## 💻 Development
 

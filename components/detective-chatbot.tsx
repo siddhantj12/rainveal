@@ -76,11 +76,15 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
       });
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 500 && errorData.error?.includes('GEMINI_API_KEY')) {
+          throw new Error('CHATBOT_OFFLINE');
+        }
         throw new Error('Failed to get response from AI detective');
       }
 
       const data = await response.json();
-      
+
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -90,10 +94,16 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
+      let errorContent = 'Sorry, I encountered an error. Please try again.';
+
+      if (error instanceof Error && error.message === 'CHATBOT_OFFLINE') {
+        errorContent = '🔧 Inspector Gemini is currently offline. The AI service needs to be configured with a valid API key. Please contact the system administrator or try again later.';
+      }
+
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: errorContent,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
