@@ -71,7 +71,12 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           message: content.trim(),
           caseId: 'theatre-case',
           mode: 'chat',
-          conversationHistory: messages.slice(-10)
+          conversationHistory: messages.slice(-10),
+          scene: 'Theatre Performance Hall',
+          phase: 'Initial exploration',
+          context: 'Player is exploring the theatre.',
+          discoveredClues: [],
+          inferenceLog: []
         }),
       });
 

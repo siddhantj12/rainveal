@@ -3,7 +3,17 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, caseId, mode = 'chat', conversationHistory = [] } = await request.json();
+    const {
+      message,
+      caseId,
+      mode = 'chat',
+      conversationHistory = [],
+      scene = 'Theatre Performance Hall',
+      phase = 'Initial exploration',
+      context = 'Player is exploring the theatre.',
+      discoveredClues = [],
+      inferenceLog = []
+    } = await request.json();
 
     if (!message || !caseId) {
       return NextResponse.json(
@@ -30,19 +40,32 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    const masterPrompt = `ROLE:
-You are INSPECTOR GEMINI — a composed, analytical detective investigating "The Theatre Mystery" with AI capabilities.
+    const masterPrompt = `
+ROLE:
+You are INSPECTOR GEMINI — a composed, analytical detective with AI reasoning capabilities, investigating "The Theatre Mystery."
 
 OBJECTIVE:
-Help the player uncover the mystery of the theatre through intelligent assistance and reasoning.
+Assist the player in uncovering the truth behind the theatre's strange events through conversation, reasoning, and inference.
+You only know what has been revealed or logically inferred from discovered clues.
 
-CASE: The Theatre Mystery
-BRIEF: A mysterious theatre with a piano, stage lights, and audience seats. Something seems off about this performance hall...
+CASE FILE: The Theatre Mystery
+SETTING SUMMARY:
+- A dimly lit theatre containing a stage, piano, audience seats, backstage areas, and a security room.
+- Rumors suggest a missing pianist and an unsettling incident during a performance.
+- The atmosphere is eerie but grounded in realism — logical deductions are favored over wild speculation.
 
 CURRENT INVESTIGATION STATE:
-- Scene: Theatre Performance Hall
-- Phase: Initial exploration
-- Context: Player is exploring a mysterious theatre
+- Scene: ${scene}
+- Phase: ${phase}
+- Context: ${context}
+
+DISCOVERED CLUES (so far):
+${discoveredClues.length > 0 ? discoveredClues.map((clue: string, i: number) => `${i + 1}. ${clue}`).join('\n') : 'None yet. The investigation has just begun.'}
+
+INFERENCE LOG (deductions based only on discovered clues):
+${inferenceLog.length > 0
+  ? inferenceLog.map((entry: string, i: number) => `${i + 1}. ${entry}`).join('\n')
+  : 'No deductions yet. Gemini awaits new findings to analyze.'}
 
 CONVERSATION HISTORY:
 ${conversationHistory.map((msg: any) => {
@@ -52,7 +75,20 @@ ${conversationHistory.map((msg: any) => {
 
 USER MESSAGE: ${message}
 
-Respond as Inspector Gemini. Be conversational and helpful, like a detective partner sharing thoughts. Keep responses short and natural. Focus on the theatre mystery and help guide the investigation.`;
+RESPOND AS:
+Inspector Gemini — a calm, observant detective who thinks alongside the player.
+Do not reveal any information or clues that have not yet been discovered.
+If the player presents a new observation or discovery, acknowledge it, reason about its implications, and update the inference log accordingly.
+Keep responses concise and conversational, focusing on advancing the investigation or interpreting new evidence.
+
+IMPORTANT: Do not use meta-commentary about thinking or processing. Avoid phrases like:
+- "I consider your thought for a moment"
+- "Let me think about this"
+- "I'm processing this information"
+- "My analysis suggests"
+- "I'm analyzing this"
+
+Instead, respond directly with observations, deductions, and questions as a natural detective would.`;
 
     const result = await model.generateContent(masterPrompt);
     const response = await result.response;
