@@ -11,6 +11,12 @@ export default function TheatrePage() {
   const [clickEffects, setClickEffects] = useState<{[key: string]: boolean}>({})
   const [audioEnabled, setAudioEnabled] = useState(false)
 
+  // Piano mystery sequence state
+  const [showPianoBackground, setShowPianoBackground] = useState(false)
+  const [revealedBrokenImages, setRevealedBrokenImages] = useState<Set<number>>(new Set())
+  const [isShaking, setIsShaking] = useState(false)
+  const [currentSequenceStep, setCurrentSequenceStep] = useState(0)
+
   // Initialize AudioContext
   const getAudioContext = () => {
     if (typeof window === 'undefined') return null
@@ -111,6 +117,47 @@ export default function TheatrePage() {
     setTimeout(() => playSound(1200, 50, 'square'), 60)
   }
 
+  // Piano mystery sequence handlers
+  const handlePianoClick = () => {
+    if (!showPianoBackground) {
+      // First click: show piano background
+      setShowPianoBackground(true)
+      playPianoSound()
+      setClickEffects(prev => ({ ...prev, 'piano': true }))
+      setTimeout(() => setClickEffects(prev => ({ ...prev, 'piano': false })), 1000)
+
+      // Trigger shaking animation
+      setIsShaking(true)
+      setTimeout(() => setIsShaking(false), 1000)
+    }
+  }
+
+  const handleBrokenImageClick = (imageNumber: number) => {
+    if (showPianoBackground && !revealedBrokenImages.has(imageNumber)) {
+      // Check if this is the next image in sequence
+      if (imageNumber === currentSequenceStep + 1) {
+        // Reveal this image
+        setRevealedBrokenImages(prev => new Set([...prev, imageNumber]))
+        setCurrentSequenceStep(imageNumber)
+
+        // Play discovery sound
+        playSound(440 + (imageNumber * 100), 300, 'triangle')
+
+        // Trigger shaking animation
+        setIsShaking(true)
+        setTimeout(() => setIsShaking(false), 1000)
+
+        // Check if sequence is complete
+        if (imageNumber === 3) {
+          // All images revealed - maybe trigger final animation
+          setTimeout(() => {
+            playSound(523.25, 500, 'sine') // High C note for completion
+          }, 500)
+        }
+      }
+    }
+  }
+
   const handleImageClick = async (imageName: string) => {
     // Resume audio context on first user interaction
     if (!audioEnabled) {
@@ -125,8 +172,8 @@ export default function TheatrePage() {
     // Different actions for each clickable element with sound effects
     switch (imageName) {
       case 'piano':
-        console.log('🎹 Piano clicked - playing melody!')
-        playPianoSound()
+        console.log('🎹 Piano clicked - starting mystery sequence!')
+        handlePianoClick()
         break
       case 'security-camera':
         console.log('📹 Security camera clicked - accessing surveillance!')
@@ -162,25 +209,89 @@ export default function TheatrePage() {
           />
         </div>
 
-        {/* Massive Piano - 3x Bigger */}
-        <div
-          className={`absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2 ${clickEffects['piano'] ? '' : ''}`}
-          onClick={() => handleImageClick('piano')}
-        >
-          <Image
-            src="/piano.PNG"
-            alt="Grand Piano"
-            width={1152}
-            height={768}
-            className="object-contain drop-shadow-2xl"
-          />
-          {clickEffects['piano'] && (
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white text-sm">
-              <Music className="w-4 h-4" />
-              <span>♪ Playing piano melody...</span>
+        {/* Piano Background (shown after clicking piano) */}
+        {showPianoBackground && (
+          <div className={`absolute inset-0 transition-opacity duration-1000 ${isShaking ? 'animate-pulse' : ''}`}>
+            <Image
+              src="/PianoBackground.PNG"
+              alt="Piano Mystery Background"
+              fill
+              className="object-cover"
+              priority
+            />
+
+            {/* Broken Images - revealed in sequence */}
+            {/* Broken Image 1 */}
+            <div
+              className={`absolute top-1/4 left-1/4 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 ${
+                revealedBrokenImages.has(1) ? 'opacity-100' : 'opacity-0'
+              } ${isShaking ? 'animate-bounce' : ''}`}
+              onClick={() => handleBrokenImageClick(1)}
+            >
+              <Image
+                src="/Broken 1.PNG"
+                alt="Broken Clue 1"
+                width={192}
+                height={192}
+                className="object-contain"
+              />
             </div>
-          )}
-        </div>
+
+            {/* Broken Image 2 */}
+            <div
+              className={`absolute top-1/3 right-1/4 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 ${
+                revealedBrokenImages.has(2) ? 'opacity-100' : 'opacity-0'
+              } ${isShaking ? 'animate-spin' : ''}`}
+              onClick={() => handleBrokenImageClick(2)}
+            >
+              <Image
+                src="/Broken 2.PNG"
+                alt="Broken Clue 2"
+                width={192}
+                height={192}
+                className="object-contain"
+              />
+            </div>
+
+            {/* Broken Image 3 */}
+            <div
+              className={`absolute bottom-1/4 left-1/2 -translate-x-1/2 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 ${
+                revealedBrokenImages.has(3) ? 'opacity-100' : 'opacity-0'
+              } ${isShaking ? 'animate-pulse' : ''}`}
+              onClick={() => handleBrokenImageClick(3)}
+            >
+              <Image
+                src="/Broken 3.PNG"
+                alt="Broken Clue 3"
+                width={192}
+                height={192}
+                className="object-contain"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Original Piano (shown initially) */}
+        {!showPianoBackground && (
+          <div
+            className={`absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2 ${clickEffects['piano'] ? '' : ''}`}
+            onClick={handlePianoClick}
+          >
+            <Image
+              src="/piano.PNG"
+              alt="Grand Piano"
+              width={1152}
+              height={768}
+              className="object-contain drop-shadow-2xl"
+            />
+            {clickEffects['piano'] && (
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white text-sm">
+                <Music className="w-4 h-4" />
+                <span>♪ Playing piano melody...</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Giant Security Camera - 20x image, tiny click area */}
         <div
@@ -205,8 +316,33 @@ export default function TheatrePage() {
       </div>
 
       <div className="mt-12 text-center relative">
-        <h1 className="text-4xl font-bold text-white mb-4 text-balance">Welcome to the Theatre</h1>
-        <p className="text-white/80 text-lg">You found the secret performance hall!</p>
+        <h1 className="text-4xl font-bold text-white mb-4 text-balance">
+          {showPianoBackground ? "🎹 Piano Mystery Unlocked!" : "Welcome to the Theatre"}
+        </h1>
+        <p className="text-white/80 text-lg">
+          {showPianoBackground
+            ? `Clues revealed: ${revealedBrokenImages.size}/3. Click the hidden images in sequence!`
+            : "You found the secret performance hall!"
+          }
+        </p>
+
+        {/* Sequence Progress Indicator */}
+        {showPianoBackground && (
+          <div className="mt-4 flex justify-center gap-2">
+            {[1, 2, 3].map((num) => (
+              <div
+                key={num}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  revealedBrokenImages.has(num)
+                    ? 'bg-green-400 scale-125'
+                    : currentSequenceStep + 1 >= num
+                      ? 'bg-yellow-400 animate-pulse'
+                      : 'bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Audio Controls */}
