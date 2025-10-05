@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Volume2, Camera, Music } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { DetectiveChatbot } from "../../components/detective-chatbot"
 
@@ -10,6 +10,8 @@ export default function TheatrePage() {
   const router = useRouter()
   const [clickEffects, setClickEffects] = useState<{[key: string]: boolean}>({})
   const [audioEnabled, setAudioEnabled] = useState(false)
+  const backgroundMusicRef = useRef<{oscillator: OscillatorNode, gainNode: GainNode} | null>(null)
+  const [showGreeting, setShowGreeting] = useState(false)
 
   // Piano mystery sequence state
   const [showPianoBackground, setShowPianoBackground] = useState(false)
@@ -62,16 +64,12 @@ export default function TheatrePage() {
     if (audioContext.state !== 'running') {
       console.log('Audio context not running, attempting to resume...')
       resumeAudioContext().then(() => {
-        if (audioEnabled) {
-          playSoundInternal(frequency, duration, type)
-        }
+        playSoundInternal(frequency, duration, type)
       })
       return
     }
 
-    if (audioEnabled) {
-      playSoundInternal(frequency, duration, type)
-    }
+    playSoundInternal(frequency, duration, type)
   }
 
   const playSoundInternal = (frequency: number, duration: number, type: OscillatorType) => {
@@ -91,13 +89,13 @@ export default function TheatrePage() {
       oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime)
       oscillator.type = type
 
-      // Maximum volume for audibility
-      gainNode.gain.setValueAtTime(1.0, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime + duration / 1000)
+      // VERY HIGH volume for audibility - increased from 1.0 to help with quiet systems
+      gainNode.gain.setValueAtTime(0.8, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.5, audioContext.currentTime + duration / 1000)
 
       oscillator.start(audioContext.currentTime)
       oscillator.stop(audioContext.currentTime + duration / 1000)
-      console.log('Playing sound:', frequency, 'Hz for', duration, 'ms')
+      console.log('🔊 Playing sound:', frequency, 'Hz for', duration, 'ms', '- Volume: 0.8')
     } catch (error) {
       console.log('Audio playback failed:', error)
     }
@@ -115,6 +113,117 @@ export default function TheatrePage() {
     playSound(800, 50, 'square')
     setTimeout(() => playSound(1000, 50, 'square'), 30)
     setTimeout(() => playSound(1200, 50, 'square'), 60)
+  }
+
+  const playAhaSound = () => {
+    // Play an "AHA!" exclamation sound - rising triumphant notes
+    playSound(392, 100, 'triangle') // G4
+    setTimeout(() => playSound(523.25, 150, 'triangle'), 80) // C5
+    setTimeout(() => playSound(659.25, 200, 'triangle'), 160) // E5
+    setTimeout(() => playSound(783.99, 300, 'sine'), 240) // G5 - triumphant!
+  }
+
+  // Mysterious detective/noir background music track
+  const playBackgroundMusic = () => {
+    const audioContext = getAudioContext()
+    if (!audioContext) {
+      console.log('Cannot play background music: no audio context')
+      return
+    }
+    
+    if (audioContext.state !== 'running') {
+      console.log('Audio context not running, cannot play background music')
+      return
+    }
+
+    // Stop any existing background music
+    stopBackgroundMusic()
+
+    try {
+      // Create a mysterious noir-style atmosphere with multiple layers
+      const masterGain = audioContext.createGain()
+      masterGain.connect(audioContext.destination)
+      masterGain.gain.setValueAtTime(0.4, audioContext.currentTime) // Increased from 0.2 to 0.4
+
+      const oscillators: OscillatorNode[] = []
+
+      // Layer 1: Deep bass drone (creates tension)
+      const bass = audioContext.createOscillator()
+      const bassGain = audioContext.createGain()
+      bass.type = 'sine'
+      bass.frequency.setValueAtTime(55, audioContext.currentTime) // A1 - deep bass
+      bassGain.gain.setValueAtTime(0.3, audioContext.currentTime)
+      bass.connect(bassGain)
+      bassGain.connect(masterGain)
+      bass.start()
+      oscillators.push(bass)
+
+      // Layer 2: Minor chord pad (mysterious harmony)
+      // A minor chord: A, C, E
+      const pad1 = audioContext.createOscillator()
+      const pad2 = audioContext.createOscillator()
+      const pad3 = audioContext.createOscillator()
+      const padGain = audioContext.createGain()
+      
+      pad1.type = 'sine'
+      pad2.type = 'sine'
+      pad3.type = 'sine'
+      
+      pad1.frequency.setValueAtTime(220, audioContext.currentTime) // A3
+      pad2.frequency.setValueAtTime(261.63, audioContext.currentTime) // C4
+      pad3.frequency.setValueAtTime(329.63, audioContext.currentTime) // E4
+      
+      padGain.gain.setValueAtTime(0.15, audioContext.currentTime)
+      
+      pad1.connect(padGain)
+      pad2.connect(padGain)
+      pad3.connect(padGain)
+      padGain.connect(masterGain)
+      
+      pad1.start()
+      pad2.start()
+      pad3.start()
+      oscillators.push(pad1, pad2, pad3)
+
+      // Layer 3: Subtle high shimmer (adds eeriness)
+      const shimmer = audioContext.createOscillator()
+      const shimmerGain = audioContext.createGain()
+      shimmer.type = 'triangle'
+      shimmer.frequency.setValueAtTime(1760, audioContext.currentTime) // A6 - very high
+      shimmerGain.gain.setValueAtTime(0.05, audioContext.currentTime)
+      shimmer.connect(shimmerGain)
+      shimmerGain.connect(masterGain)
+      shimmer.start()
+      oscillators.push(shimmer)
+
+      // Add slow LFO for breathing effect
+      const lfo = audioContext.createOscillator()
+      const lfoGain = audioContext.createGain()
+      lfo.frequency.value = 0.15 // Very slow breathing effect
+      lfoGain.gain.value = 0.02
+      lfo.connect(lfoGain)
+      lfoGain.connect(masterGain.gain)
+      lfo.start()
+
+      // Store reference for cleanup
+      backgroundMusicRef.current = { oscillator: bass, gainNode: masterGain }
+      
+      console.log('Mysterious detective music started')
+    } catch (error) {
+      console.log('Failed to start background music:', error)
+    }
+  }
+
+  const stopBackgroundMusic = () => {
+    if (backgroundMusicRef.current) {
+      try {
+        backgroundMusicRef.current.oscillator.stop()
+        backgroundMusicRef.current = null
+        console.log('Background music stopped')
+      } catch (error) {
+        console.log('Error stopping background music:', error)
+      }
+    }
   }
 
   // Piano mystery sequence handlers
@@ -181,6 +290,109 @@ export default function TheatrePage() {
         break
     }
   }
+
+  // Start background music and show detective greeting when entering the theatre
+  useEffect(() => {
+    // Check if user has already seen the greeting
+    const hasSeenGreeting = sessionStorage.getItem('theatre-greeting-shown')
+    
+    // Show detective greeting only on first visit from weather app
+    if (!hasSeenGreeting) {
+      const greetingTimer = setTimeout(async () => {
+        setShowGreeting(true)
+        sessionStorage.setItem('theatre-greeting-shown', 'true')
+        
+        // Try to play AHA sound - will work if user has interacted
+        const audioContext = getAudioContext()
+        if (audioContext) {
+          // Resume audio context if needed
+          if (audioContext.state === 'suspended') {
+            try {
+              await audioContext.resume()
+              console.log('Audio context resumed for AHA sound')
+            } catch (error) {
+              console.log('Could not resume audio context for AHA:', error)
+            }
+          }
+          
+          // Play AHA sound
+          if (audioContext.state === 'running') {
+            console.log('Playing AHA sound')
+            playAhaSound()
+          } else {
+            console.log('Audio context not running, AHA sound skipped')
+          }
+        }
+      }, 1500)
+
+      // Cleanup greeting timer
+      return () => {
+        clearTimeout(greetingTimer)
+      }
+    }
+  }, [])
+
+  // Auto-play background music when page loads
+  useEffect(() => {
+    let audioInitialized = false
+
+    // Enable audio on first user interaction
+    const enableAudioOnInteraction = async () => {
+      if (audioInitialized) return
+      audioInitialized = true
+
+      console.log('Enabling audio...')
+      const audioContext = getAudioContext()
+      
+      if (!audioContext) {
+        console.log('No audio context available')
+        return
+      }
+
+      try {
+        if (audioContext.state === 'suspended') {
+          console.log('Resuming audio context...')
+          await audioContext.resume()
+        }
+        
+        console.log('Audio context state:', audioContext.state)
+        setAudioEnabled(true)
+        
+        // If greeting is showing, play AHA sound now
+        if (showGreeting) {
+          console.log('Playing AHA sound after user interaction')
+          playAhaSound()
+        }
+        
+        // Start background music after enabling audio
+        setTimeout(() => {
+          console.log('Starting background music...')
+          playBackgroundMusic()
+        }, 800)
+      } catch (error) {
+        console.error('Failed to enable audio:', error)
+      }
+    }
+
+    // Listen for any user interaction to enable audio
+    const handleInteraction = () => {
+      console.log('User interaction detected')
+      enableAudioOnInteraction()
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleInteraction)
+      document.removeEventListener('keydown', handleInteraction)
+    }
+
+    document.addEventListener('click', handleInteraction)
+    document.addEventListener('keydown', handleInteraction)
+
+    // Cleanup: stop music when leaving the page
+    return () => {
+      document.removeEventListener('click', handleInteraction)
+      document.removeEventListener('keydown', handleInteraction)
+      stopBackgroundMusic()
+    }
+  }, [showGreeting])
 
   return (
     <div className="min-h-screen theatre-gradient relative overflow-hidden">
@@ -269,19 +481,25 @@ export default function TheatrePage() {
 
         {/* Original Piano (shown initially) */}
         {!showPianoBackground && (
-          <div
-            className="absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2"
-            onClick={() => {
-            // Simple single click - immediate navigation to piano closeup
-            router.push("/piano-closeup")
-          }}
-          >
-            <Image
-              src="/piano.PNG"
-              alt="Grand Piano"
-              width={1152}
-              height={768}
-              className="object-contain drop-shadow-2xl"
+          <div className="absolute bottom-1/8 left-1/2 -translate-x-1/2">
+            {/* Large visual piano image */}
+            <div className="w-[1152px] h-[768px]">
+              <Image
+                src="/piano.PNG"
+                alt="Grand Piano"
+                width={1152}
+                height={768}
+                className="object-contain drop-shadow-2xl w-full h-full"
+              />
+            </div>
+
+            {/* Small clickable area positioned over the piano */}
+            <div
+              className="absolute top-1/3 left-1/3 w-[150px] h-[120px] cursor-pointer transition-all duration-300 hover:scale-110 bg-transparent"
+              onClick={() => {
+              // Simple single click - immediate navigation to piano closeup
+              router.push("/piano-closeup")
+            }}
             />
           </div>
         )}
@@ -338,30 +556,34 @@ export default function TheatrePage() {
         )}
       </div>
 
-      {/* Audio Controls */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-        {!audioEnabled && (
-          <button
-            onClick={() => resumeAudioContext()}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-300 hover:scale-110"
-            title="Enable Audio"
-          >
-            <Volume2 className="w-6 h-6" />
-          </button>
-        )}
 
-        {/* Audio Test Button */}
-        <button
-          onClick={() => {
-            console.log('Testing audio...')
-            playSound(440, 500, 'sine') // A4 note
-          }}
-          className="bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm rounded-full p-2 text-white text-xs transition-all duration-300 hover:scale-110"
-          title="Test Audio (A4 440Hz)"
-        >
-          🔊
-        </button>
-      </div>
+      {/* Detective Greeting Popup */}
+      {showGreeting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="glass rounded-3xl p-8 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500 pointer-events-auto">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="text-6xl">🕵️</div>
+              <div>
+                <h2 className="text-3xl font-bold text-white mb-2">AHA!</h2>
+                <p className="text-xl text-white/90">Welcome, Detective!</p>
+              </div>
+            </div>
+            <div className="text-white/80 space-y-2">
+              <p>I'm <strong className="text-white">Inspector Gemini</strong>, and I need your help!</p>
+              <p>Something mysterious is happening in this theatre...</p>
+              <p className="text-sm text-white/60 mt-4">
+                💡 Click around to investigate, and chat with me if you need assistance!
+              </p>
+            </div>
+            <button
+              onClick={() => setShowGreeting(false)}
+              className="mt-4 w-full bg-white/20 hover:bg-white/30 rounded-xl px-4 py-2 text-white transition-all duration-300"
+            >
+              Let's solve this mystery! 🔍
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Detective Chatbot - Now integrated into the theatre scene */}
       <DetectiveChatbot />

@@ -39,6 +39,12 @@ export default function Home() {
         }
         setAudioEnabled(true)
         console.log('Audio enabled, context state:', audioContext.state)
+        
+        // Play a test sound to confirm audio is working
+        setTimeout(() => {
+          console.log('Playing test sound...')
+          playSound(440, 200, 'sine') // A4 note
+        }, 100)
       } catch (error) {
         console.log('Could not resume audio context:', error)
       }
@@ -58,16 +64,13 @@ export default function Home() {
     if (audioContext.state !== 'running') {
       console.log('Audio context not running, attempting to resume...')
       resumeAudioContext().then(() => {
-        if (audioEnabled) {
-          playSoundInternal(frequency, duration, type)
-        }
+        // Play sound immediately after resuming context
+        playSoundInternal(frequency, duration, type)
       })
       return
     }
 
-    if (audioEnabled) {
-      playSoundInternal(frequency, duration, type)
-    }
+    playSoundInternal(frequency, duration, type)
   }
 
   const playSoundInternal = (frequency: number, duration: number, type: OscillatorType) => {
@@ -100,18 +103,40 @@ export default function Home() {
   }
 
   const playCurtainSound = () => {
-    // Play a dramatic curtain opening sound (low rumbling with swish)
-    playSound(100, 800, 'sawtooth') // Low rumble
-    setTimeout(() => playSound(150, 600, 'triangle'), 200) // Swish effect
-    setTimeout(() => playSound(80, 1000, 'sine'), 400) // Final flourish
+    // Play a dramatic theatrical curtain opening sound
+    // Low rumbling of curtain mechanism
+    playSound(80, 1000, 'sawtooth')
+    setTimeout(() => playSound(90, 900, 'sawtooth'), 100)
+    
+    // Swishing of fabric
+    setTimeout(() => playSound(200, 600, 'triangle'), 300)
+    setTimeout(() => playSound(250, 500, 'triangle'), 400)
+    
+    // Dramatic reveal chord (theatrical fanfare)
+    setTimeout(() => {
+      playSound(261.63, 800, 'sine') // C4
+      setTimeout(() => playSound(329.63, 800, 'sine'), 50) // E4
+      setTimeout(() => playSound(392.00, 800, 'sine'), 100) // G4
+      setTimeout(() => playSound(523.25, 1000, 'sine'), 150) // C5 - dramatic high note
+    }, 800)
   }
 
   const playRainSound = () => {
-    // Play a gentle rain sound effect (multiple light tones)
-    const raindrops = [400, 450, 500, 550, 600, 650]
+    // Play a more immersive rain sound effect (multiple overlapping raindrops)
+    const raindrops = [400, 450, 500, 550, 600, 650, 700, 750, 800]
+    
+    // Initial burst of rain
     raindrops.forEach((freq, index) => {
-      setTimeout(() => playSound(freq, 150, 'triangle'), index * 100)
+      setTimeout(() => playSound(freq, 150, 'triangle'), index * 80)
     })
+    
+    // Continuous rain effect (loops for 2 seconds)
+    for (let i = 0; i < 20; i++) {
+      setTimeout(() => {
+        const randomFreq = 400 + Math.random() * 400
+        playSound(randomFreq, 100, 'triangle')
+      }, 800 + i * 100)
+    }
   }
 
   // Listen for theatre navigation trigger
@@ -139,11 +164,7 @@ export default function Home() {
     // Listen for custom events from WeatherDashboard
     window.addEventListener('navigateToTheatre', handleTheatreNavigation)
     window.addEventListener('rainStarted', () => {
-      // Resume audio context for first interaction
-      if (!audioEnabled) {
-        resumeAudioContext()
-      }
-      // Play rain sound effect
+      // Play rain sound effect - audio context will be resumed automatically if needed
       playRainSound()
     })
 
@@ -206,30 +227,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Audio Controls */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-        {!audioEnabled && (
-          <button
-            onClick={() => resumeAudioContext()}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-300 hover:scale-110"
-            title="Enable Audio"
-          >
-            <Volume2 className="w-6 h-6" />
-          </button>
-        )}
-
-        {/* Audio Test Button */}
-        <button
-          onClick={() => {
-            console.log('Testing audio...')
-            playSound(440, 500, 'sine') // A4 note
-          }}
-          className="bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm rounded-full p-2 text-white text-xs transition-all duration-300 hover:scale-110"
-          title="Test Audio (A4 440Hz)"
-        >
-          🔊
-        </button>
-      </div>
     </main>
   )
 }

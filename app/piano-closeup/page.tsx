@@ -95,60 +95,63 @@ export default function PianoCloseupPage() {
 
       {/* Canvas */}
       <div className="relative w-full h-screen flex items-center justify-center">
-        {/* Single background (no splash, no duplicate) */}
-        {showPianoBackground && (
-          <Image
-            src="/piano/piano-background.png"
-            alt="Piano Background"
-            fill
-            className={`absolute inset-0 object-cover transition-opacity duration-700 ${isShaking ? "animate-pulse" : ""}`}
-            priority
-          />
-        )}
-
-        {/* Overlays by state */}
-        {showPianoBackground && (
-          <>
-            {currentSequenceStep >= 1 && (
-              <Image 
-                src={brokenImgs[0]} 
-                alt="" 
-                width={800}
-                height={600}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-190 object-contain pointer-events-none z-20" 
-                priority 
-              />
-            )}
-            {currentSequenceStep >= 2 && (
-              <Image 
-                src={brokenImgs[1]} 
-                alt="" 
-                width={800}
-                height={600}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-190 object-contain pointer-events-none z-20" 
-                priority 
-              />
-            )}
-            {currentSequenceStep >= 3 && (
-              <Image 
-                src={brokenImgs[2]} 
-                alt="" 
-                width={800}
-                height={600}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-190 object-contain pointer-events-none z-20" 
-                priority 
-              />
-            )}
-
-            {/* Single hotspot to advance the break */}
-            <button
-              aria-label="Press damaged key"
-              onClick={advanceBreak}
-              className="absolute z-40"
-              style={{ left: HOTSPOT.left, top: HOTSPOT.top, width: HOTSPOT.width, height: HOTSPOT.height }}
+        {/* Piano interaction area - establishes positioning context */}
+        <div className="relative w-full h-full">
+          {/* Single background (no splash, no duplicate) */}
+          {showPianoBackground && (
+            <Image
+              src="/piano/piano-background.png"
+              alt="Piano Background"
+              fill
+              className={`absolute inset-0 object-cover transition-opacity duration-700 ${isShaking ? "animate-pulse" : ""}`}
+              priority
             />
-          </>
-        )}
+          )}
+
+          {/* Overlays by state */}
+          {showPianoBackground && (
+            <>
+              {currentSequenceStep >= 1 && (
+                <Image 
+                  src={brokenImgs[0]} 
+                  alt="" 
+                  width={800}
+                  height={600}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain pointer-events-none z-20" 
+                  priority 
+                />
+              )}
+              {currentSequenceStep >= 2 && (
+                <Image 
+                  src={brokenImgs[1]} 
+                  alt="" 
+                  width={800}
+                  height={600}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain pointer-events-none z-20" 
+                  priority 
+                />
+              )}
+              {currentSequenceStep >= 3 && (
+                <Image 
+                  src={brokenImgs[2]} 
+                  alt="" 
+                  width={800}
+                  height={600}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain pointer-events-none z-20" 
+                  priority 
+                />
+              )}
+
+              {/* Single hotspot to advance the break */}
+              <button
+                aria-label="Press damaged key"
+                onClick={advanceBreak}
+                className="absolute z-40"
+                style={{ left: HOTSPOT.left, top: HOTSPOT.top, width: HOTSPOT.width, height: HOTSPOT.height }}
+              />
+            </>
+          )}
+        </div>
       </div>
 
       {/* Step indicator */}
@@ -162,25 +165,6 @@ export default function PianoCloseupPage() {
         </div>
       )}
 
-      {/* Audio controls */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-        {!audioEnabled && (
-          <button
-            onClick={() => resumeAudioContext()}
-            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-300 hover:scale-110"
-            title="Enable Audio"
-          >
-            <Volume2 className="w-6 h-6" />
-          </button>
-        )}
-        <button
-          onClick={() => playSound(440, 500, "sine")}
-          className="bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm rounded-full p-2 text-white text-xs transition-all duration-300 hover:scale-110"
-          title="Test Audio (A4 440Hz)"
-        >
-          🔊
-        </button>
-      </div>
 
       <DetectiveChatbot />
     </div>
