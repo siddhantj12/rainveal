@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
+import { DetectiveChatbot } from "../../components/detective-chatbot"
 
 export default function TheatrePage() {
   const router = useRouter()
@@ -71,6 +72,9 @@ export default function TheatrePage() {
         <h1 className="text-4xl font-bold text-white mb-4 text-balance">Welcome to the Theatre</h1>
         <p className="text-white/80 text-lg">You found the secret performance hall!</p>
       </div>
+      
+      {/* Detective Chatbot */}
+      <DetectiveChatbot />
     </div>
   )
 }
