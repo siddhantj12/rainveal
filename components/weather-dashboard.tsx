@@ -76,8 +76,12 @@ export function WeatherDashboard() {
 
   const handleRoamingCloudClick = () => {
     setIsRaining(true)
+    // Play rain sound effect
+    window.dispatchEvent(new CustomEvent('rainStarted'))
+
     setTimeout(() => {
-      router.push("/theatre")
+      // Dispatch custom event for curtains transition
+      window.dispatchEvent(new CustomEvent('navigateToTheatre'))
     }, 2000)
   }
 
