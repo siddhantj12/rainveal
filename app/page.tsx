@@ -39,6 +39,12 @@ export default function Home() {
         }
         setAudioEnabled(true)
         console.log('Audio enabled, context state:', audioContext.state)
+        
+        // Play a test sound to confirm audio is working
+        setTimeout(() => {
+          console.log('Playing test sound...')
+          playSound(440, 200, 'sine') // A4 note
+        }, 100)
       } catch (error) {
         console.log('Could not resume audio context:', error)
       }
@@ -179,11 +185,21 @@ export default function Home() {
         <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top duration-500">
           <button
             onClick={() => resumeAudioContext()}
-            className="glass rounded-2xl px-6 py-3 text-white hover:bg-white/30 transition-all duration-300 flex items-center gap-2 shadow-lg"
+            className="glass rounded-2xl px-6 py-3 text-white hover:bg-white/30 transition-all duration-300 flex items-center gap-2 shadow-lg animate-pulse"
           >
             <Volume2 className="w-5 h-5" />
-            <span className="text-sm font-medium">Enable Sound</span>
+            <span className="text-sm font-medium">🔊 Enable Sound (Click Me!)</span>
           </button>
+        </div>
+      )}
+      
+      {/* Audio Status Indicator */}
+      {audioEnabled && (
+        <div className="fixed top-4 right-4 z-50 animate-in fade-in duration-500">
+          <div className="glass rounded-2xl px-6 py-3 text-white flex items-center gap-2">
+            <Volume2 className="w-5 h-5 text-green-400" />
+            <span className="text-sm font-medium">Sound Active ✓</span>
+          </div>
         </div>
       )}
 
