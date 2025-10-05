@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { 
@@ -34,6 +35,36 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const pathname = usePathname();
+
+  // Get current location and clues based on pathname
+  const getCurrentLocation = () => {
+    if (pathname.includes('/piano-closeup')) {
+      return {
+        location: 'piano-closeup',
+        locationClues: ['grand piano keys', 'cracked E-flat key', 'piano bench', 'stage lighting']
+      };
+    } else if (pathname.includes('/security-room')) {
+      return {
+        location: 'security-room',
+        locationClues: ['security monitors', 'working camera feed', 'surveillance equipment', 'control panel']
+      };
+    } else if (pathname.includes('/security-camera')) {
+      return {
+        location: 'security-camera',
+        locationClues: ['woman leaving building', 'broken nail', 'exit door', 'nighttime footage', 'hurried departure']
+      };
+    } else if (pathname.includes('/theatre')) {
+      return {
+        location: 'theatre',
+        locationClues: ['grand piano', 'stage lights', 'audience seats', 'curtains', 'microphone stand']
+      };
+    }
+    return {
+      location: 'unknown',
+      locationClues: []
+    };
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -61,6 +92,9 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
     setInputValue('');
     setIsLoading(true);
 
+    // Get current location context
+    const currentLocation = getCurrentLocation();
+
     try {
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
@@ -76,7 +110,9 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           phase: 'Initial exploration',
           context: 'Player is exploring the theatre.',
           discoveredClues: [],
-          inferenceLog: []
+          inferenceLog: [],
+          location: currentLocation.location,
+          locationClues: currentLocation.locationClues
         }),
       });
 
@@ -149,21 +185,21 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className={`w-96 shadow-2xl transition-all duration-200 bg-gray-900 rounded-lg border border-gray-700 ${
+        <div className={`w-96 shadow-2xl transition-all duration-200 bg-black rounded-lg border border-gray-600 ${
           isMinimized ? 'h-16' : 'h-[500px]'
         }`}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
+          <div className="flex items-center justify-between p-4 border-b border-gray-600 bg-black text-white rounded-t-lg">
             <div className="flex items-center gap-2">
-              <Bot className="w-5 h-5" />
-              <span className="font-semibold">Inspector Gemini</span>
+              <Bot className="w-5 h-5 text-gray-300" />
+              <span className="font-semibold text-white">Inspector Gemini</span>
             </div>
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsMinimized(!isMinimized)}
-                className="text-white hover:bg-blue-800"
+                className="text-gray-300 hover:bg-gray-800 hover:text-white"
               >
                 {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
               </Button>
@@ -171,7 +207,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsOpen(false)}
-                className="text-white hover:bg-blue-800"
+                className="text-gray-300 hover:bg-gray-800 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -181,14 +217,14 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           {!isMinimized && (
             <>
               {/* Quick Actions */}
-              <div className="p-3 border-b border-gray-700 bg-gray-800">
+              <div className="p-3 border-b border-gray-600 bg-gray-900">
                 <div className="flex gap-2 flex-wrap">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => sendMessage("Tell me about this theatre case")}
                     disabled={isLoading}
-                    className="text-xs"
+                    className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
                   >
                     <MessageCircle className="w-3 h-3 mr-1" />
                     Case Info
@@ -198,7 +234,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                     size="sm"
                     onClick={() => sendMessage("Give me a hint about the mystery")}
                     disabled={isLoading}
-                    className="text-xs"
+                    className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
                   >
                     <Bot className="w-3 h-3 mr-1" />
                     Hint
@@ -207,7 +243,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                     variant="outline"
                     size="sm"
                     onClick={clearChat}
-                    className="text-xs"
+                    className="text-xs text-gray-300 border-gray-600 bg-gray-800 hover:bg-gray-700 hover:text-white hover:border-gray-500"
                   >
                     Clear
                   </Button>
@@ -215,7 +251,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 p-4 h-[280px] overflow-y-auto bg-gray-900">
+              <div className="flex-1 p-4 h-[280px] overflow-y-auto bg-black">
                 {messages.length === 0 ? (
                   <div className="text-center text-gray-300 py-8">
                     <Bot className="w-12 h-12 mx-auto mb-3 text-gray-400" />
@@ -232,8 +268,8 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                         <div
                           className={`max-w-[80%] rounded-lg p-3 ${
                             message.role === 'user'
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-700 text-gray-100'
+                              ? 'bg-gray-800 text-white border border-gray-600'
+                              : 'bg-gray-900 text-gray-100 border border-gray-700'
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-1">
@@ -252,8 +288,8 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-gray-700 rounded-lg p-3 flex items-center gap-2">
-                          <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                        <div className="bg-gray-900 rounded-lg p-3 flex items-center gap-2 border border-gray-700">
+                          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                           <span className="text-sm text-gray-200">Inspector Gemini is thinking...</span>
                         </div>
                       </div>
@@ -264,7 +300,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
               </div>
 
               {/* Input */}
-              <div className="p-4 border-t border-gray-700 bg-gray-800">
+              <div className="p-4 border-t border-gray-600 bg-gray-900">
                 <form onSubmit={handleSubmit} className="flex gap-2">
                   <Input
                     ref={inputRef}
@@ -272,9 +308,13 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder="Ask Inspector Gemini about the mystery..."
                     disabled={isLoading}
-                    className="flex-1"
+                    className="flex-1 bg-gray-800 text-white placeholder-gray-400 border-gray-600 focus:border-gray-500 focus:ring-gray-500"
                   />
-                  <Button type="submit" disabled={isLoading || !inputValue.trim()}>
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || !inputValue.trim()}
+                    className="bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+                  >
                     <Send className="w-4 h-4" />
                   </Button>
                 </form>

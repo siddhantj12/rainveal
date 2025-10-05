@@ -6,14 +6,13 @@ import { useState } from "react"
 import Image from "next/image"
 import { DetectiveChatbot } from "../../components/detective-chatbot"
 
-export default function TheatrePage() {
+export default function PianoCloseupPage() {
   const router = useRouter()
   const [clickEffects, setClickEffects] = useState<{[key: string]: boolean}>({})
   const [audioEnabled, setAudioEnabled] = useState(false)
 
   // Piano mystery sequence state
   const [showPianoBackground, setShowPianoBackground] = useState(false)
-  const [revealedBrokenImages, setRevealedBrokenImages] = useState<Set<number>>(new Set())
   const [isShaking, setIsShaking] = useState(false)
   const [currentSequenceStep, setCurrentSequenceStep] = useState(0)
 
@@ -132,30 +131,46 @@ export default function TheatrePage() {
     }
   }
 
-  const handleBrokenImageClick = (imageNumber: number) => {
-    if (showPianoBackground && !revealedBrokenImages.has(imageNumber)) {
-      // Check if this is the next image in sequence
-      if (imageNumber === currentSequenceStep + 1) {
-        // Reveal this image
-        setRevealedBrokenImages(prev => new Set([...prev, imageNumber]))
-        setCurrentSequenceStep(imageNumber)
+  // where to click (percent of canvas) - centered on piano key area
+  const HOTSPOT = { left: '35%', top: '30%', width: '30%', height: '40%' } // larger area for easier clicking
 
-        // Play discovery sound
-        playSound(440 + (imageNumber * 100), 300, 'triangle')
+  // sequential overlay images
+  const brokenImgs = [
+    '/piano/broken-1.png',
+    '/piano/broken-2.png',
+    '/piano/broken-3.png',
+  ] as const
 
-        // Trigger shaking animation
-        setIsShaking(true)
-        setTimeout(() => setIsShaking(false), 1000)
+  // one hotspot that advances 0->1->2->3
+  const advanceBreak = async () => {
+    console.log('advanceBreak called, current step:', currentSequenceStep)
+    if (!audioEnabled) await resumeAudioContext()
 
-        // Check if sequence is complete
-        if (imageNumber === 3) {
-          // All images revealed - maybe trigger final animation
-          setTimeout(() => {
-            playSound(523.25, 500, 'sine') // High C note for completion
-          }, 500)
+    setIsShaking(true)
+    setTimeout(() => setIsShaking(false), 250)
+
+    setCurrentSequenceStep(prev => {
+      // derive next stage from currentSequenceStep
+      const next = Math.min(prev + 1, 3)
+      console.log('Advancing from', prev, 'to', next)
+      if (next > prev) {
+        // sound feedback per stage
+        playSound(480 + next * 80, 220, 'triangle')
+
+        // finished at 3 -> store clue / toast / whatever
+        if (next === 3) {
+          try {
+            const found = JSON.parse(localStorage.getItem('case-001:clues') || '[]')
+            if (!found.includes('clue_hinge_shadow')) {
+              found.push('clue_hinge_shadow')
+              localStorage.setItem('case-001:clues', JSON.stringify(found))
+            }
+          } catch {}
         }
+        return next
       }
-    }
+      return prev
+    })
   }
 
   const handleImageClick = async (imageName: string) => {
@@ -187,31 +202,20 @@ export default function TheatrePage() {
   }
 
   return (
-    <div className="min-h-screen theatre-gradient relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       <button
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/theatre")}
         className="fixed top-8 left-8 glass rounded-2xl px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 z-50"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span>Back to Weather</span>
+        <span>Back to Theatre</span>
       </button>
 
-      {/* Enhanced Theatre Canvas */}
+      {/* Piano Mystery Canvas */}
       <div className="relative w-full h-screen flex items-center justify-center">
-        {/* Background Stage Layer - Non-interactive */}
-        <div className="absolute inset-0">
-          <Image
-            src="/stage-2.PNG"
-            alt="Theatre Stage Background"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-
         {/* Piano Background (shown after clicking piano) */}
         {showPianoBackground && (
-          <div className={`absolute inset-0 transition-opacity duration-1000 ${isShaking ? 'animate-pulse' : ''}`}>
+          <div className={`absolute inset-0 transition-opacity duration-1000 pointer-events-none ${isShaking ? 'animate-pulse' : ''}`}>
             <Image
               src="/PianoBackground.PNG"
               alt="Piano Mystery Background"
@@ -219,68 +223,73 @@ export default function TheatrePage() {
               className="object-cover"
               priority
             />
-
-            {/* Broken Images - revealed in sequence */}
-            {/* Broken Image 1 */}
-            <div
-              className={`absolute top-1/4 left-1/4 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
-                revealedBrokenImages.has(1) ? 'opacity-100' : 'opacity-0'
-              } ${isShaking ? 'animate-bounce' : ''}`}
-              onClick={() => handleBrokenImageClick(1)}
-            >
-              <Image
-                src="/Broken 1.PNG"
-                alt="Broken Clue 1"
-                width={192}
-                height={192}
-                className="object-contain"
-              />
-            </div>
-
-            {/* Broken Image 2 */}
-            <div
-              className={`absolute top-1/3 right-1/4 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
-                revealedBrokenImages.has(2) ? 'opacity-100' : 'opacity-0'
-              } ${isShaking ? 'animate-spin' : ''}`}
-              onClick={() => handleBrokenImageClick(2)}
-            >
-              <Image
-                src="/Broken 2.PNG"
-                alt="Broken Clue 2"
-                width={192}
-                height={192}
-                className="object-contain"
-              />
-            </div>
-
-            {/* Broken Image 3 */}
-            <div
-              className={`absolute bottom-1/4 left-1/2 -translate-x-1/2 w-48 h-48 cursor-pointer transition-all duration-500 hover:scale-105 z-10 ${
-                revealedBrokenImages.has(3) ? 'opacity-100' : 'opacity-0'
-              } ${isShaking ? 'animate-pulse' : ''}`}
-              onClick={() => handleBrokenImageClick(3)}
-            >
-              <Image
-                src="/Broken 3.PNG"
-                alt="Broken Clue 3"
-                width={192}
-                height={192}
-                className="object-contain"
-              />
-            </div>
           </div>
+        )}
+
+        {/* Background */}
+        {showPianoBackground && (
+          <div className={`absolute inset-0 transition-opacity duration-700 ${isShaking ? 'animate-pulse' : ''}`}>
+            <Image
+              src="/piano/piano-background.png"
+              alt="Piano Background"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+        )}
+
+        {/* Overlays (auto-stacked by state) */}
+        {showPianoBackground && (
+          <>
+            {currentSequenceStep >= 1 && (
+              <Image
+                src={brokenImgs[0]}
+                alt=""
+                fill
+                className="absolute inset-0 object-contain pointer-events-none"
+                priority
+              />
+            )}
+            {currentSequenceStep >= 2 && (
+              <Image
+                src={brokenImgs[1]}
+                alt=""
+                fill
+                className="absolute inset-0 object-contain pointer-events-none"
+                priority
+              />
+            )}
+            {currentSequenceStep >= 3 && (
+              <Image
+                src={brokenImgs[2]}
+                alt=""
+                fill
+                className="absolute inset-0 object-contain pointer-events-none"
+                priority
+              />
+            )}
+
+            {/* Single hotspot to advance the break */}
+            <button
+              aria-label="Press damaged key"
+              onClick={advanceBreak}
+              className="absolute z-40"
+              style={{
+                left: HOTSPOT.left,
+                top: HOTSPOT.top,
+                width: HOTSPOT.width,
+                height: HOTSPOT.height,
+              }}
+            />
+          </>
         )}
 
         {/* Original Piano (shown initially) */}
         {!showPianoBackground && (
           <div
             className={`absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2 ${clickEffects['piano'] ? '' : ''}`}
-            onClick={() => {
-            setClickEffects(prev => ({ ...prev, 'piano': true }))
-            setTimeout(() => setClickEffects(prev => ({ ...prev, 'piano': false })), 1000)
-            playPianoSound()
-            setTimeout(() => router.push("/piano-closeup"), 500)
-          }}
+            onClick={handlePianoClick}
           >
             <Image
               src="/piano.PNG"
@@ -292,42 +301,21 @@ export default function TheatrePage() {
             {clickEffects['piano'] && (
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white text-sm">
                 <Music className="w-4 h-4" />
-                <span>♪ Opening piano mystery...</span>
+                <span>♪ Playing piano melody...</span>
               </div>
             )}
           </div>
         )}
-
-        {/* Giant Security Camera - 20x image, tiny click area */}
-        <div
-          className={`absolute top-32 left-16 w-32 h-32 cursor-pointer transition-all duration-300 hover:scale-110 ${clickEffects['security-camera'] ? 'animate-pulse' : ''}`}
-          onClick={() => handleImageClick('security-camera')}
-        >
-          <Image
-            src="/security Camera.PNG"
-            alt="Security Camera"
-            width={3840}
-            height={3840}
-            className="object-contain"
-          />
-          {clickEffects['security-camera'] && (
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white text-xs">
-              <Camera className="w-3 h-3" />
-              <span>Recording...</span>
-            </div>
-          )}
-        </div>
-
       </div>
 
       <div className="mt-12 text-center relative">
         <h1 className="text-4xl font-bold text-white mb-4 text-balance">
-          {showPianoBackground ? "🎹 Piano Mystery Unlocked!" : "Welcome to the Theatre"}
+          {showPianoBackground ? "🎹 Piano Mystery Unlocked!" : "Interactive Piano Experience"}
         </h1>
         <p className="text-white/80 text-lg">
           {showPianoBackground
-            ? `Clues revealed: ${revealedBrokenImages.size}/3. Click the hidden images in sequence!`
-            : "You found the secret performance hall!"
+            ? `Piano key damage: ${currentSequenceStep}/3. Keep pressing the damaged key!`
+            : "Click the piano to begin the mystery sequence!"
           }
         </p>
 
@@ -338,11 +326,9 @@ export default function TheatrePage() {
               <div
                 key={num}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  revealedBrokenImages.has(num)
+                  currentSequenceStep >= num
                     ? 'bg-green-400 scale-125'
-                    : currentSequenceStep + 1 >= num
-                      ? 'bg-yellow-400 animate-pulse'
-                      : 'bg-gray-600'
+                    : 'bg-gray-600'
                 }`}
               />
             ))}
@@ -375,7 +361,7 @@ export default function TheatrePage() {
         </button>
       </div>
 
-      {/* Detective Chatbot - Now integrated into the theatre scene */}
+      {/* Detective Chatbot */}
       <DetectiveChatbot />
     </div>
   )
