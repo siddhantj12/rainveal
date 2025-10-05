@@ -269,19 +269,25 @@ export default function TheatrePage() {
 
         {/* Original Piano (shown initially) */}
         {!showPianoBackground && (
-          <div
-            className="absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2"
-            onClick={() => {
-            // Simple single click - immediate navigation to piano closeup
-            router.push("/piano-closeup")
-          }}
-          >
-            <Image
-              src="/piano.PNG"
-              alt="Grand Piano"
-              width={1152}
-              height={768}
-              className="object-contain drop-shadow-2xl"
+          <div className="absolute bottom-1/8 left-1/2 -translate-x-1/2">
+            {/* Large visual piano image */}
+            <div className="w-[1152px] h-[768px]">
+              <Image
+                src="/piano.PNG"
+                alt="Grand Piano"
+                width={1152}
+                height={768}
+                className="object-contain drop-shadow-2xl w-full h-full"
+              />
+            </div>
+
+            {/* Small clickable area positioned over the piano */}
+            <div
+              className="absolute top-1/3 left-1/3 w-[150px] h-[120px] cursor-pointer transition-all duration-300 hover:scale-110 bg-transparent"
+              onClick={() => {
+              // Simple single click - immediate navigation to piano closeup
+              router.push("/piano-closeup")
+            }}
             />
           </div>
         )}

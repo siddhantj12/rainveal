@@ -95,29 +95,31 @@ export default function PianoCloseupPage() {
 
       {/* Canvas */}
       <div className="relative w-full h-screen flex items-center justify-center">
-        {/* Single background (no splash, no duplicate) */}
-        {showPianoBackground && (
-          <Image
-            src="/piano/piano-background.png"
-            alt="Piano Background"
-            fill
-            className={`absolute inset-0 object-cover transition-opacity duration-700 ${isShaking ? "animate-pulse" : ""}`}
-            priority
-          />
-        )}
+        {/* Piano interaction area - establishes positioning context */}
+        <div className="relative w-full h-full">
+          {/* Single background (no splash, no duplicate) */}
+          {showPianoBackground && (
+            <Image
+              src="/piano/piano-background.png"
+              alt="Piano Background"
+              fill
+              className={`absolute inset-0 object-cover transition-opacity duration-700 ${isShaking ? "animate-pulse" : ""}`}
+              priority
+            />
+          )}
 
-        {/* Overlays by state */}
-        {showPianoBackground && (
-          <>
-            {currentSequenceStep >= 1 && (
-              <Image src={brokenImgs[0]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
-            )}
-            {currentSequenceStep >= 2 && (
-              <Image src={brokenImgs[1]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
-            )}
-            {currentSequenceStep >= 3 && (
-              <Image src={brokenImgs[2]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
-            )}
+          {/* Overlays by state */}
+          {showPianoBackground && (
+            <>
+              {currentSequenceStep >= 1 && (
+                <Image src={brokenImgs[0]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
+              )}
+              {currentSequenceStep >= 2 && (
+                <Image src={brokenImgs[1]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
+              )}
+              {currentSequenceStep >= 3 && (
+                <Image src={brokenImgs[2]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
+              )}
 
             {/* Single hotspot to advance the break */}
             <button
@@ -126,8 +128,9 @@ export default function PianoCloseupPage() {
               className="absolute z-40"
               style={{ left: HOTSPOT.left, top: HOTSPOT.top, width: HOTSPOT.width, height: HOTSPOT.height }}
             />
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Step indicator */}

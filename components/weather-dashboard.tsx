@@ -140,7 +140,7 @@ export function WeatherDashboard() {
           className="fixed roaming-cloud z-40 cursor-pointer hover:scale-110 transition-transform"
           aria-label="Secret roaming cloud"
         >
-          <Cloud className="w-16 h-16 text-white/60 drop-shadow-lg" />
+          <Cloud className="w-32 h-32 text-white/60 drop-shadow-lg" />
         </button>
       )}
 

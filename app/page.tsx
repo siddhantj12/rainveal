@@ -58,16 +58,13 @@ export default function Home() {
     if (audioContext.state !== 'running') {
       console.log('Audio context not running, attempting to resume...')
       resumeAudioContext().then(() => {
-        if (audioEnabled) {
-          playSoundInternal(frequency, duration, type)
-        }
+        // Play sound immediately after resuming context
+        playSoundInternal(frequency, duration, type)
       })
       return
     }
 
-    if (audioEnabled) {
-      playSoundInternal(frequency, duration, type)
-    }
+    playSoundInternal(frequency, duration, type)
   }
 
   const playSoundInternal = (frequency: number, duration: number, type: OscillatorType) => {
@@ -139,11 +136,7 @@ export default function Home() {
     // Listen for custom events from WeatherDashboard
     window.addEventListener('navigateToTheatre', handleTheatreNavigation)
     window.addEventListener('rainStarted', () => {
-      // Resume audio context for first interaction
-      if (!audioEnabled) {
-        resumeAudioContext()
-      }
-      // Play rain sound effect
+      // Play rain sound effect - audio context will be resumed automatically if needed
       playRainSound()
     })
 
