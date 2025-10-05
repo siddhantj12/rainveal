@@ -171,10 +171,6 @@ export default function TheatrePage() {
 
     // Different actions for each clickable element with sound effects
     switch (imageName) {
-      case 'piano':
-        console.log('🎹 Piano clicked - starting mystery sequence!')
-        handlePianoClick()
-        break
       case 'security-camera':
         console.log('📹 Security camera clicked - accessing surveillance!')
         playCameraSound()
@@ -274,12 +270,10 @@ export default function TheatrePage() {
         {/* Original Piano (shown initially) */}
         {!showPianoBackground && (
           <div
-            className={`absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2 ${clickEffects['piano'] ? '' : ''}`}
+            className="absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2"
             onClick={() => {
-            setClickEffects(prev => ({ ...prev, 'piano': true }))
-            setTimeout(() => setClickEffects(prev => ({ ...prev, 'piano': false })), 1000)
-            playPianoSound()
-            setTimeout(() => router.push("/piano-closeup"), 500)
+            // Simple single click - immediate navigation to piano closeup
+            router.push("/piano-closeup")
           }}
           >
             <Image
@@ -289,12 +283,6 @@ export default function TheatrePage() {
               height={768}
               className="object-contain drop-shadow-2xl"
             />
-            {clickEffects['piano'] && (
-              <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white text-sm">
-                <Music className="w-4 h-4" />
-                <span>♪ Opening piano mystery...</span>
-              </div>
-            )}
           </div>
         )}
 

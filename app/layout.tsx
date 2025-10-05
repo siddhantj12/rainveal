@@ -10,9 +10,9 @@ const geistSans = GeistSans.variable
 const geistMono = GeistMono.variable
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "Rainveal",
+  description: "Interactive Weather Theatre Experience",
+  generator: "Rainveal",
 }
 
 export default function RootLayout({
