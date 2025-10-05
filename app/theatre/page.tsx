@@ -89,13 +89,13 @@ export default function TheatrePage() {
       oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime)
       oscillator.type = type
 
-      // Maximum volume for audibility
-      gainNode.gain.setValueAtTime(1.0, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime + duration / 1000)
+      // VERY HIGH volume for audibility - increased from 1.0 to help with quiet systems
+      gainNode.gain.setValueAtTime(0.8, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.5, audioContext.currentTime + duration / 1000)
 
       oscillator.start(audioContext.currentTime)
       oscillator.stop(audioContext.currentTime + duration / 1000)
-      console.log('Playing sound:', frequency, 'Hz for', duration, 'ms')
+      console.log('🔊 Playing sound:', frequency, 'Hz for', duration, 'ms', '- Volume: 0.8')
     } catch (error) {
       console.log('Audio playback failed:', error)
     }
@@ -143,7 +143,7 @@ export default function TheatrePage() {
       // Create a mysterious noir-style atmosphere with multiple layers
       const masterGain = audioContext.createGain()
       masterGain.connect(audioContext.destination)
-      masterGain.gain.setValueAtTime(0.2, audioContext.currentTime)
+      masterGain.gain.setValueAtTime(0.4, audioContext.currentTime) // Increased from 0.2 to 0.4
 
       const oscillators: OscillatorNode[] = []
 
@@ -396,19 +396,6 @@ export default function TheatrePage() {
 
   return (
     <div className="min-h-screen theatre-gradient relative overflow-hidden">
-      {/* Audio Enable Prompt */}
-      {!audioEnabled && (
-        <div className="fixed top-4 right-4 z-50 animate-in fade-in slide-in-from-top duration-500">
-          <button
-            onClick={() => resumeAudioContext()}
-            className="glass rounded-2xl px-6 py-3 text-white hover:bg-white/30 transition-all duration-300 flex items-center gap-2 shadow-lg"
-          >
-            <Volume2 className="w-5 h-5" />
-            <span className="text-sm font-medium">Enable Sound</span>
-          </button>
-        </div>
-      )}
-
       <button
         onClick={() => router.push("/")}
         className="fixed top-8 left-8 glass rounded-2xl px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 z-50"
