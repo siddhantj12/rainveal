@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Toast } from "@/components/ui/Toast"
+import { ArrowLeft } from "lucide-react"
 
 // Hotspot for the rolled note (normalized 0..1 rect)
-const ROLLED_NOTE = { x: 0.57, y: 0.62, w: 0.10, h: 0.12 }
+const ROLLED_NOTE = { x: 0.62, y: 0.62, w: 0.20, h: 0.24 }
 
 export default function PianoNoteScene() {
   const router = useRouter()
@@ -58,6 +59,14 @@ export default function PianoNoteScene() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black">
+      <button
+        onClick={() => router.push("/theatre")}
+        className="fixed top-8 left-8 glass rounded-2xl px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 z-50"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span>Back to Theatre</span>
+      </button>
+
       <div id="piano-note-container" className="relative w-full h-screen">
         {/* Background piano image (with missing key) */}
         <Image
@@ -65,7 +74,7 @@ export default function PianoNoteScene() {
           alt="Piano with missing key"
           fill
           priority
-          className="object-contain"
+          className="object-cover"
         />
 
         {/* Rolled note hotspot */}
@@ -109,13 +118,6 @@ export default function PianoNoteScene() {
                   className="bg-white/20 hover:bg-white/30 text-white rounded-xl px-4 py-2 transition"
                 >
                   Mark as read
-                </button>
-
-                <button
-                  onClick={() => router.push("/")}
-                  className="bg-white/10 hover:bg-white/20 text-white rounded-xl px-4 py-2 transition"
-                >
-                  Back to Weather
                 </button>
               </div>
             </div>
