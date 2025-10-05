@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, Volume2, Camera, Music } from "lucide-react"
 import { useState } from "react"
 import Image from "next/image"
+import { DetectiveChatbot } from "../../components/detective-chatbot"
 
 export default function TheatrePage() {
   const router = useRouter()
@@ -110,21 +111,6 @@ export default function TheatrePage() {
     setTimeout(() => playSound(1200, 50, 'square'), 60)
   }
 
-  const playCurtainSound = () => {
-    // Play a dramatic curtain opening sound (low rumbling with swish)
-    playSound(100, 800, 'sawtooth') // Low rumble
-    setTimeout(() => playSound(150, 600, 'triangle'), 200) // Swish effect
-    setTimeout(() => playSound(80, 1000, 'sine'), 400) // Final flourish
-  }
-
-  const playRainSound = () => {
-    // Play a gentle rain sound effect (multiple light tones)
-    const raindrops = [400, 450, 500, 550, 600, 650]
-    raindrops.forEach((freq, index) => {
-      setTimeout(() => playSound(freq, 150, 'triangle'), index * 100)
-    })
-  }
-
   const handleImageClick = async (imageName: string) => {
     // Resume audio context on first user interaction
     if (!audioEnabled) {
@@ -163,7 +149,7 @@ export default function TheatrePage() {
         <span>Back to Weather</span>
       </button>
 
-      {/* Interactive Canvas Layer */}
+      {/* Enhanced Theatre Canvas */}
       <div className="relative w-full h-screen flex items-center justify-center">
         {/* Background Stage Layer - Non-interactive */}
         <div className="absolute inset-0">
@@ -176,7 +162,7 @@ export default function TheatrePage() {
           />
         </div>
 
-        {/* Piano Layer - 3x Bigger */}
+        {/* Massive Piano - 3x Bigger */}
         <div
           className={`absolute bottom-1/8 left-1/2 -translate-x-1/2 w-[1152px] h-[768px] cursor-pointer transition-all duration-300 hover:scale-110 hover:-translate-y-2 ${clickEffects['piano'] ? '' : ''}`}
           onClick={() => handleImageClick('piano')}
@@ -196,7 +182,7 @@ export default function TheatrePage() {
           )}
         </div>
 
-        {/* Security Camera Layer */}
+        {/* Giant Security Camera - 20x image, tiny click area */}
         <div
           className={`absolute top-32 left-16 w-32 h-32 cursor-pointer transition-all duration-300 hover:scale-110 ${clickEffects['security-camera'] ? 'animate-pulse' : ''}`}
           onClick={() => handleImageClick('security-camera')}
@@ -216,28 +202,72 @@ export default function TheatrePage() {
           )}
         </div>
 
-      </div>
+        {/* Audience Seats with Inspector Gemini */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-4xl">
+          <div className="audience-seats grid grid-cols-7 gap-2 relative">
+            {Array.from({ length: 21 }).map((_, i) => (
+              <div key={i} className={`seat w-full h-16 bg-gradient-to-b from-red-700 to-red-900 rounded-t-lg shadow-lg transition-all duration-300 hover:scale-105 ${
+                i === 10 ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
+              }`} />
+            ))}
 
-      {/* Interactive Legend */}
-      <div className="fixed bottom-8 right-8 glass rounded-2xl p-4 text-white text-sm space-y-2">
-        <h3 className="font-semibold mb-2">Interactive Elements:</h3>
-        <div className="flex items-center gap-2">
-          <Music className="w-4 h-4" />
-          <span>Piano - Click to play</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Camera className="w-4 h-4" />
-          <span>Camera - Click to record</span>
-        </div>
-
-        {/* Audio Status Indicator */}
-        <div className="mt-4 pt-3 border-t border-white/20">
-          <div className={`flex items-center gap-2 text-xs ${audioEnabled ? 'text-green-400' : 'text-yellow-400'}`}>
-            <Volume2 className={`w-3 h-3 ${audioEnabled ? '' : 'animate-pulse'}`} />
-            <span>{audioEnabled ? 'Audio Enabled' : 'Click any element to enable sound'}</span>
+            {/* Inspector Gemini - positioned in center audience seat */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20">
+              <div className="relative">
+                {/* Detective silhouette */}
+                <div className="w-12 h-16 bg-gradient-to-b from-gray-800 to-black rounded-t-full shadow-lg"></div>
+                {/* Detective head */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-gradient-to-b from-amber-200 to-amber-400 rounded-full shadow-md"></div>
+                {/* Detective hat */}
+                <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-6 h-3 bg-gradient-to-b from-gray-700 to-black rounded-full shadow-sm"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <div className="mt-12 text-center relative">
+        <h1 className="text-4xl font-bold text-white mb-4 text-balance">Welcome to the Theatre</h1>
+        <p className="text-white/80 text-lg">You found the secret performance hall!</p>
+
+        {/* Mystery Clue */}
+        <div className="mt-6 max-w-md mx-auto">
+          <div className="glass rounded-xl p-4 text-center">
+            <div className="text-yellow-400 text-sm font-medium mb-2">🎭 Theatre Mystery</div>
+            <p className="text-white/90 text-sm">
+              Something mysterious is happening in this theatre. Inspector Gemini is here to help you investigate...
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Audio Controls */}
+      <div className="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+        {!audioEnabled && (
+          <button
+            onClick={() => resumeAudioContext()}
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-300 hover:scale-110"
+            title="Enable Audio"
+          >
+            <Volume2 className="w-6 h-6" />
+          </button>
+        )}
+
+        {/* Audio Test Button */}
+        <button
+          onClick={() => {
+            console.log('Testing audio...')
+            playSound(440, 500, 'sine') // A4 note
+          }}
+          className="bg-blue-500/20 hover:bg-blue-500/30 backdrop-blur-sm rounded-full p-2 text-white text-xs transition-all duration-300 hover:scale-110"
+          title="Test Audio (A4 440Hz)"
+        >
+          🔊
+        </button>
+      </div>
+
+      {/* Detective Chatbot - Now integrated into the theatre scene */}
+      <DetectiveChatbot />
     </div>
   )
 }
