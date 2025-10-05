@@ -283,6 +283,10 @@ export default function TheatrePage() {
       case 'security-camera':
         console.log('📹 Security camera clicked - accessing surveillance!')
         playCameraSound()
+        // Navigate to security room after brief delay for sound effect
+        setTimeout(() => {
+          router.push('/security-room')
+        }, 300)
         break
       case 'stage':
         console.log('🎭 Stage clicked - curtain call!')
