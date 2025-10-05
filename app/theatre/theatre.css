@@ -1,0 +1,72 @@
+.theatre-gradient {
+  background: linear-gradient(180deg, #3d2817 0%, #5c3d2e 30%, #8b6f47 60%, #2c1810 100%);
+}
+
+.stage-lights {
+  display: flex;
+  gap: 2rem;
+}
+
+.spotlight {
+  width: 60px;
+  height: 80px;
+  background: linear-gradient(to bottom, #4a5568, transparent);
+  border-radius: 8px 8px 40% 40%;
+  position: relative;
+  animation: spotlight-glow 3s ease-in-out infinite;
+}
+
+.spotlight::before {
+  content: "";
+  position: absolute;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+@keyframes spotlight-glow {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.curtain-left,
+.curtain-right {
+  position: absolute;
+  top: 0;
+  width: 120px;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #8b4513 0px, #a0522d 10px, #8b4513 20px);
+  box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.curtain-left {
+  left: -100px;
+  border-radius: 0 20px 20px 0;
+}
+
+.curtain-right {
+  right: -100px;
+  border-radius: 20px 0 0 20px;
+  box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.stage-floor {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.seat {
+  transition: transform 0.2s;
+}
+
+.seat:hover {
+  transform: scale(1.05);
+}
