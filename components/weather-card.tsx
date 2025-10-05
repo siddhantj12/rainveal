@@ -100,7 +100,7 @@ export function WeatherCard({
 
         {uvUnlocked && isUV && (
           <div className="text-xs text-yellow-200/90 mt-2 font-semibold animate-pulse">
-            ⚠️ Tap the sun to reveal the truth
+            ⚠️ Tap the sun to reveal the truth!
           </div>
         )}
       </div>
