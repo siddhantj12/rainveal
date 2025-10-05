@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Volume2 } from "lucide-react"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { DetectiveChatbot } from "../../components/detective-chatbot"
 
 export default function PianoCloseupPage() {
@@ -46,52 +46,19 @@ export default function PianoCloseupPage() {
     if (audioEnabled) go()
   }
 
-  // Cracking sound effect for piano keys
+  // Cracking sound effect using audio files
+  const crackingSounds = ["/cracking-bones_1.mp3", "/cracking-bones_2.mp3"]
+  const crackingSoundIndex = useRef(0)
+
   const playBreakingSound = () => {
-    const ctx = getAudioContext()
-    if (!ctx || ctx.state !== "running") return
-
     try {
-      // Sharp crackling/snapping sound
-      // Layer 1: Quick sharp snap
-      const snap = ctx.createOscillator()
-      const snapGain = ctx.createGain()
-      snap.type = "square"
-      snap.frequency.setValueAtTime(3500, ctx.currentTime)
-      snap.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.08)
-      snapGain.gain.setValueAtTime(0.9, ctx.currentTime)
-      snapGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08)
-      snap.connect(snapGain)
-      snapGain.connect(ctx.destination)
-      snap.start()
-      snap.stop(ctx.currentTime + 0.08)
-
-      // Layer 2: Crackling texture
-      const crackle1 = ctx.createOscillator()
-      const crackleGain1 = ctx.createGain()
-      crackle1.type = "square"
-      crackle1.frequency.setValueAtTime(1800, ctx.currentTime + 0.03)
-      crackle1.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.12)
-      crackleGain1.gain.setValueAtTime(0.7, ctx.currentTime + 0.03)
-      crackleGain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12)
-      crackle1.connect(crackleGain1)
-      crackleGain1.connect(ctx.destination)
-      crackle1.start(ctx.currentTime + 0.03)
-      crackle1.stop(ctx.currentTime + 0.12)
-
-      // Layer 3: Secondary crack
-      const crackle2 = ctx.createOscillator()
-      const crackleGain2 = ctx.createGain()
-      crackle2.type = "sawtooth"
-      crackle2.frequency.setValueAtTime(2200, ctx.currentTime + 0.06)
-      crackle2.frequency.exponentialRampToValueAtTime(500, ctx.currentTime + 0.15)
-      crackleGain2.gain.setValueAtTime(0.6, ctx.currentTime + 0.06)
-      crackleGain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15)
-      crackle2.connect(crackleGain2)
-      crackleGain2.connect(ctx.destination)
-      crackle2.start(ctx.currentTime + 0.06)
-      crackle2.stop(ctx.currentTime + 0.15)
-
+      const audio = new Audio(crackingSounds[crackingSoundIndex.current])
+      audio.volume = 0.7
+      audio.play().catch(() => {})
+      
+      // Alternate between the two sounds
+      crackingSoundIndex.current = (crackingSoundIndex.current + 1) % crackingSounds.length
+      
       console.log("💥 CRACK!")
     } catch (error) {
       console.log("Cracking sound failed:", error)
