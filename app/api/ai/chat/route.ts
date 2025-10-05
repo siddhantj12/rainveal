@@ -42,7 +42,17 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    const masterPrompt = `CONTEXT INJECTION PROTOCOL:
+    // Check if this is a casual conversation or case-related inquiry
+    const isCasualGreeting = /^(hello|hi|hey|how are you|what's up|good morning|good afternoon|good evening)/i.test(message.trim());
+    const isCaseRelated = /(case|mystery|clue|evidence|investigate|detective|aurelia|piano|theatre|abduction|disappearance)/i.test(message);
+    
+    const masterPrompt = isCasualGreeting && !isCaseRelated ? 
+      `You are Inspector Gemini, a friendly detective character in a mystery game. The user is greeting you casually. Respond warmly and briefly, then gently guide them toward the mystery if appropriate. Keep it conversational and human-like. Be friendly but maintain your detective persona.
+
+USER MESSAGE: ${message}
+
+Respond as Inspector Gemini would - friendly, professional, and ready to help with the case.` :
+      `CONTEXT INJECTION PROTOCOL:
 The user's input will always be preceded by a dynamic JSON object in the format: {"location": "[PAGE_SLUG]", "clues": "[LOCATION_SPECIFIC_CLUES]"}. This payload defines INSPECTOR GEMINI's current physical position and the evidence available there. **Your analysis and observations MUST be tethered to this injected context.** If the user asks a vague question (e.g., "What is this?"), answer based only on the details provided in the "clues" key for the current "location."
 
 CURRENT CONTEXT:

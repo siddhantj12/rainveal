@@ -173,11 +173,11 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           <img 
             src="/detective.png" 
             alt="Detective Chat" 
-            className="w-20 h-20 object-contain hover:scale-110 transition-transform duration-200"
+            className="w-35 h-35 object-contain hover:scale-110 transition-transform duration-200"
             onError={(e) => {
               // Fallback to emoji if image doesn't exist
               e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.innerHTML = '<div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white text-2xl">🕵️</div>';
+              e.currentTarget.parentElement!.innerHTML = '<div class="w-35 h-35 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white text-2xl">🕵️</div>';
             }}
           />
         </button>
