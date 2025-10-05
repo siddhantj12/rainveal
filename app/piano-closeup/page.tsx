@@ -112,22 +112,43 @@ export default function PianoCloseupPage() {
           {showPianoBackground && (
             <>
               {currentSequenceStep >= 1 && (
-                <Image src={brokenImgs[0]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
+                <Image 
+                  src={brokenImgs[0]} 
+                  alt="" 
+                  width={800}
+                  height={600}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain pointer-events-none z-20" 
+                  priority 
+                />
               )}
               {currentSequenceStep >= 2 && (
-                <Image src={brokenImgs[1]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
+                <Image 
+                  src={brokenImgs[1]} 
+                  alt="" 
+                  width={800}
+                  height={600}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain pointer-events-none z-20" 
+                  priority 
+                />
               )}
               {currentSequenceStep >= 3 && (
-                <Image src={brokenImgs[2]} alt="" fill className="absolute inset-0 object-contain pointer-events-none" priority />
+                <Image 
+                  src={brokenImgs[2]} 
+                  alt="" 
+                  width={800}
+                  height={600}
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 object-contain pointer-events-none z-20" 
+                  priority 
+                />
               )}
 
-            {/* Single hotspot to advance the break */}
-            <button
-              aria-label="Press damaged key"
-              onClick={advanceBreak}
-              className="absolute z-40"
-              style={{ left: HOTSPOT.left, top: HOTSPOT.top, width: HOTSPOT.width, height: HOTSPOT.height }}
-            />
+              {/* Single hotspot to advance the break */}
+              <button
+                aria-label="Press damaged key"
+                onClick={advanceBreak}
+                className="absolute z-40"
+                style={{ left: HOTSPOT.left, top: HOTSPOT.top, width: HOTSPOT.width, height: HOTSPOT.height }}
+              />
             </>
           )}
         </div>
