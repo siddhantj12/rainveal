@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: "Rainveal",
   description: "Interactive Weather Theatre Experience",
   generator: "Rainveal",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
 }
 
 export default function RootLayout({
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="stylesheet" href="/theatre/theatre.css" />
       </head>
       <body className={`${geistSans} ${geistMono} antialiased`}>

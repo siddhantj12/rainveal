@@ -38,15 +38,15 @@ export function WeatherCard({
 
   const CardInner = (
     <div className="space-y-2">
-      <div className="text-3xl font-semibold">{value}</div>
-      {subtitle && <div className="text-sm text-white/70">{subtitle}</div>}
+      <div className="text-2xl sm:text-3xl font-semibold">{value}</div>
+      {subtitle && <div className="text-xs sm:text-sm text-white/70">{subtitle}</div>}
       {description && <div className="text-xs text-white/60 mt-2">{description}</div>}
 
       {showCompass && (
-        <div className="flex items-center justify-center mt-4">
-          <div className="relative w-20 h-20 rounded-full border-2 border-white/30">
+        <div className="flex items-center justify-center mt-3 sm:mt-4">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-white/30">
             <div className="absolute inset-0 flex items-center justify-center">
-              <Navigation className="w-8 h-8 text-white" style={{ transform: "rotate(0deg)" }} />
+              <Navigation className="w-6 h-6 sm:w-8 sm:h-8 text-white" style={{ transform: "rotate(0deg)" }} />
             </div>
             <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs">N</div>
             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs">S</div>
@@ -57,10 +57,10 @@ export function WeatherCard({
       )}
 
       {showUVBar && (
-        <div className="mt-4">
+        <div className="mt-3 sm:mt-4">
           <div className="h-2 rounded-full bg-gradient-to-r from-green-400 via-yellow-400 via-orange-400 to-red-500 relative">
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-1 h-4 bg-white rounded-full"
+              className="absolute top-1/2 -translate-y-1/2 w-1 h-3 sm:h-4 bg-white rounded-full"
               style={{ left: `${(uvIndex / 11) * 100}%` }}
             />
           </div>
@@ -85,7 +85,7 @@ export function WeatherCard({
   return (
     <>
       <div
-        className={`glass rounded-2xl p-6 text-white transition-all duration-300 ${
+        className={`glass rounded-2xl p-4 sm:p-6 text-white transition-all duration-300 ${
           uvUnlocked && isUV 
             ? 'hover:bg-yellow-500/20 hover:shadow-[0_0_30px_rgba(250,204,21,0.4)] cursor-pointer ring-2 ring-yellow-400/50' 
             : ''
@@ -102,7 +102,7 @@ export function WeatherCard({
           'aria-label': 'Reveal the truth' 
         } : {})}
       >
-        <div className="flex items-center gap-2 mb-4 text-white/70">
+        <div className="flex items-center gap-2 mb-3 sm:mb-4 text-white/70">
           {uvIcon}
           <span className="text-xs font-medium uppercase tracking-wider">{title}</span>
         </div>
@@ -128,7 +128,7 @@ export function WeatherCard({
           }}
         >
           <div
-            className="relative bg-amber-50 text-black max-w-2xl w-[90vw] p-8 rounded-lg shadow-2xl animate-in fade-in zoom-in duration-300"
+            className="relative bg-amber-50 text-black max-w-2xl w-[95vw] sm:w-[90vw] p-4 sm:p-8 rounded-lg shadow-2xl animate-in fade-in zoom-in duration-300"
             onClick={(e) => e.stopPropagation()}
             style={{ fontFamily: 'Courier New, monospace' }}
           >
@@ -146,15 +146,15 @@ export function WeatherCard({
               <X className="w-5 h-5" />
             </button>
 
-            <div className="border-4 border-black p-6 space-y-4">
-              <div className="text-center border-b-2 border-black pb-4">
-                <h2 className="text-3xl font-bold uppercase tracking-wider">CALL SHEET</h2>
-                <p className="text-sm mt-1">PRODUCTION: "████████"</p>
+            <div className="border-4 border-black p-3 sm:p-6 space-y-3 sm:space-y-4">
+              <div className="text-center border-b-2 border-black pb-3 sm:pb-4">
+                <h2 className="text-xl sm:text-3xl font-bold uppercase tracking-wider">CALL SHEET</h2>
+                <p className="text-xs sm:text-sm mt-1">PRODUCTION: "████████"</p>
                 <p className="text-xs text-gray-600">Case #001 - Date: ██/██/████</p>
               </div>
 
-              <div className="space-y-3 text-sm">
-                <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-3 text-xs sm:text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div><strong>SHOOT DAY:</strong> [TODAY]</div>
                   <div><strong>LOCATION:</strong> Theatre District</div>
                 </div>

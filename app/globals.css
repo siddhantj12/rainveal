@@ -315,4 +315,112 @@
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    /* Reduce cloud sizes for mobile */
+    .cloud-1 {
+      width: 120px;
+      height: 40px;
+    }
+    
+    .cloud-2 {
+      width: 180px;
+      height: 50px;
+    }
+    
+    .cloud-3 {
+      width: 150px;
+      height: 45px;
+    }
+
+    /* Optimize roaming cloud for mobile */
+    .roaming-cloud {
+      animation: roam-mobile 20s ease-in-out infinite;
+    }
+
+    @keyframes roam-mobile {
+      0% {
+        top: 15%;
+        left: 5%;
+      }
+      25% {
+        top: 50%;
+        left: 85%;
+      }
+      50% {
+        top: 25%;
+        left: 75%;
+      }
+      75% {
+        top: 60%;
+        left: 15%;
+      }
+      100% {
+        top: 15%;
+        left: 5%;
+      }
+    }
+
+    /* Mobile-friendly rain animation */
+    .rain-drop {
+      width: 1px;
+      height: 30px;
+    }
+
+    /* Touch-friendly interactions */
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Mobile-specific glass effect */
+    .glass-mobile {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  /* Extra small mobile devices */
+  @media (max-width: 480px) {
+    .cloud-1, .cloud-2, .cloud-3 {
+      display: none; /* Hide clouds on very small screens for performance */
+    }
+
+    .roaming-cloud {
+      animation: none; /* Disable roaming animation on very small screens */
+    }
+
+    /* Optimize text sizes for very small screens */
+    .text-4xl {
+      font-size: 2rem;
+    }
+    
+    .text-6xl {
+      font-size: 3rem;
+    }
+    
+    .text-8xl {
+      font-size: 4rem;
+    }
+  }
+
+  /* Touch device optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .hover\:scale-110:hover {
+      transform: none;
+    }
+    
+    .hover\:bg-white\/20:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Increase touch targets */
+    button, .cursor-pointer {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
 }

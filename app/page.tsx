@@ -40,11 +40,13 @@ export default function Home() {
         setAudioEnabled(true)
         console.log('Audio enabled, context state:', audioContext.state)
         
-        // Play a test sound to confirm audio is working
-        setTimeout(() => {
-          console.log('Playing test sound...')
-          playSound(440, 200, 'sine') // A4 note
-        }, 100)
+        // Play a test sound to confirm audio is working (only on desktop)
+        if (window.innerWidth > 768) {
+          setTimeout(() => {
+            console.log('Playing test sound...')
+            playSound(440, 200, 'sine') // A4 note
+          }, 100)
+        }
       } catch (error) {
         console.log('Could not resume audio context:', error)
       }
@@ -90,13 +92,15 @@ export default function Home() {
       oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime)
       oscillator.type = type
 
-      // Maximum volume for audibility
-      gainNode.gain.setValueAtTime(1.0, audioContext.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime + duration / 1000)
+      // Adjust volume based on device type
+      const isMobile = window.innerWidth <= 768
+      const baseVolume = isMobile ? 0.6 : 1.0
+      gainNode.gain.setValueAtTime(baseVolume, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(baseVolume * 0.3, audioContext.currentTime + duration / 1000)
 
       oscillator.start(audioContext.currentTime)
       oscillator.stop(audioContext.currentTime + duration / 1000)
-      console.log('Playing sound:', frequency, 'Hz for', duration, 'ms')
+      console.log('Playing sound:', frequency, 'Hz for', duration, 'ms', 'Volume:', baseVolume)
     } catch (error) {
       console.log('Audio playback failed:', error)
     }
@@ -179,6 +183,19 @@ export default function Home() {
   return (
     <main className="min-h-screen relative overflow-hidden">
       <div className="fixed inset-0 -z-10 weather-gradient" />
+
+      {/* Mobile Audio Enable Button */}
+      {!audioEnabled && (
+        <div className="fixed top-4 right-4 z-40 sm:hidden">
+          <button
+            onClick={resumeAudioContext}
+            className="glass rounded-2xl px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 touch-target"
+          >
+            <Volume2 className="w-4 h-4" />
+            <span className="text-sm">Enable Audio</span>
+          </button>
+        </div>
+      )}
 
       {/* Weather App Content with Fade Effect */}
       <div className={`transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>

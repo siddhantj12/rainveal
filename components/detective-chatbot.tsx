@@ -253,16 +253,16 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="hover:scale-105 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl"
+          className="hover:scale-105 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl touch-target"
         >
           <img 
             src="/detective.png" 
             alt="Detective Chat" 
-            className="w-35 h-35 object-contain hover:scale-110 transition-transform duration-200"
+            className="w-20 h-20 sm:w-35 sm:h-35 object-contain hover:scale-110 transition-transform duration-200"
             onError={(e) => {
               // Fallback to emoji if image doesn't exist
               e.currentTarget.style.display = 'none';
-              e.currentTarget.parentElement!.innerHTML = '<div class="w-35 h-35 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white text-2xl">🕵️</div>';
+              e.currentTarget.parentElement!.innerHTML = '<div class="w-20 h-20 sm:w-35 sm:h-35 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl">🕵️</div>';
             }}
           />
         </button>
@@ -270,14 +270,14 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className={`w-96 shadow-2xl transition-all duration-200 bg-black rounded-lg border border-gray-600 ${
-          isMinimized ? 'h-16' : 'h-[500px]'
+        <div className={`w-[95vw] sm:w-96 shadow-2xl transition-all duration-200 bg-black rounded-lg border border-gray-600 ${
+          isMinimized ? 'h-16' : 'h-[400px] sm:h-[500px]'
         }`}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-600 bg-black text-white rounded-t-lg">
+          <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-600 bg-black text-white rounded-t-lg">
             <div className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-gray-300" />
-              <span className="font-semibold text-white">
+              <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-gray-300" />
+              <span className="font-semibold text-white text-sm sm:text-base">
                 {chatMode === 'submission' ? 'Captain Claude' : 'Inspector Gemini'}
               </span>
             </div>
@@ -286,7 +286,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsMinimized(!isMinimized)}
-                className="text-gray-300 hover:bg-gray-800 hover:text-white"
+                className="text-gray-300 hover:bg-gray-800 hover:text-white touch-target"
               >
                 {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
               </Button>
@@ -294,7 +294,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsOpen(false)}
-                className="text-gray-300 hover:bg-gray-800 hover:text-white"
+                className="text-gray-300 hover:bg-gray-800 hover:text-white touch-target"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -304,8 +304,8 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
           {!isMinimized && (
             <>
               {/* Quick Actions */}
-              <div className="p-3 border-b border-gray-600 bg-gray-900">
-                <div className="flex gap-2 flex-wrap">
+              <div className="p-2 sm:p-3 border-b border-gray-600 bg-gray-900">
+                <div className="flex gap-1 sm:gap-2 flex-wrap">
                   {chatMode === 'investigation' ? (
                     <>
                       <Button
@@ -371,46 +371,46 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 p-4 h-[280px] overflow-y-auto bg-black">
+              <div className="flex-1 p-3 sm:p-4 h-[200px] sm:h-[280px] overflow-y-auto bg-black">
                 {messages.length === 0 ? (
-                  <div className="text-center text-gray-300 py-8">
-                    <Bot className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p className="text-sm text-gray-200">Welcome! I'm Inspector Gemini, your AI detective assistant.</p>
-                    <p className="text-xs mt-2 text-gray-400">Ask me about the theatre mystery!</p>
+                  <div className="text-center text-gray-300 py-4 sm:py-8">
+                    <Bot className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-gray-400" />
+                    <p className="text-xs sm:text-sm text-gray-200">Welcome! I'm Inspector Gemini, your AI detective assistant.</p>
+                    <p className="text-xs mt-1 sm:mt-2 text-gray-400">Ask me about the theatre mystery!</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {messages.map((message) => (
                       <div
                         key={message.id}
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg p-3 ${
+                          className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 ${
                             message.role === 'user'
                               ? 'bg-gray-800 text-white border border-gray-600'
                               : 'bg-gray-900 text-gray-100 border border-gray-700'
                           }`}
                         >
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-1 sm:gap-2 mb-1">
                             {message.role === 'user' ? (
-                              <User className="w-4 h-4" />
+                              <User className="w-3 h-3 sm:w-4 sm:h-4" />
                             ) : (
-                              <Bot className="w-4 h-4" />
+                              <Bot className="w-3 h-3 sm:w-4 sm:h-4" />
                             )}
                             <span className="text-xs opacity-70">
                               {message.timestamp.toLocaleTimeString()}
                             </span>
                           </div>
-                          <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                          <div className="text-xs sm:text-sm whitespace-pre-wrap">{message.content}</div>
                         </div>
                       </div>
                     ))}
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="bg-gray-900 rounded-lg p-3 flex items-center gap-2 border border-gray-700">
-                          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                          <span className="text-sm text-gray-200">Inspector Gemini is thinking...</span>
+                        <div className="bg-gray-900 rounded-lg p-2 sm:p-3 flex items-center gap-2 border border-gray-700">
+                          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin text-gray-400" />
+                          <span className="text-xs sm:text-sm text-gray-200">Inspector Gemini is thinking...</span>
                         </div>
                       </div>
                     )}
@@ -420,7 +420,7 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
               </div>
 
               {/* Input */}
-              <div className="p-4 border-t border-gray-600 bg-gray-900">
+              <div className="p-3 sm:p-4 border-t border-gray-600 bg-gray-900">
                 <form onSubmit={handleSubmit} className="flex gap-2">
                   <Input
                     ref={inputRef}
@@ -428,14 +428,14 @@ export function DetectiveChatbot({ className = '' }: DetectiveChatbotProps) {
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder={chatMode === 'submission' ? "Present your case to Captain Claude..." : "Ask Inspector Gemini about the mystery..."}
                     disabled={isLoading}
-                    className="flex-1 bg-gray-800 text-white placeholder-gray-400 border-gray-600 focus:border-gray-500 focus:ring-gray-500"
+                    className="flex-1 bg-gray-800 text-white placeholder-gray-400 border-gray-600 focus:border-gray-500 focus:ring-gray-500 text-sm"
                   />
                   <Button 
                     type="submit" 
                     disabled={isLoading || !inputValue.trim()}
-                    className="bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white hover:border-gray-500"
+                    className="bg-gray-800 text-gray-300 border-gray-600 hover:bg-gray-700 hover:text-white hover:border-gray-500 touch-target"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 </form>
               </div>

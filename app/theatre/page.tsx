@@ -402,10 +402,10 @@ export default function TheatrePage() {
     <div className="min-h-screen theatre-gradient relative overflow-hidden">
       <button
         onClick={() => router.push("/")}
-        className="fixed top-8 left-8 glass rounded-2xl px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 z-50"
+        className="fixed top-4 left-4 sm:top-8 sm:left-8 glass rounded-2xl px-3 sm:px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 z-50 touch-target"
       >
-        <ArrowLeft className="w-5 h-5" />
-        <span>Back to Weather</span>
+        <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span className="text-sm sm:text-base">Back to Weather</span>
       </button>
 
       {/* Enhanced Theatre Canvas */}
@@ -510,7 +510,7 @@ export default function TheatrePage() {
 
         {/* Giant Security Camera - 20x image, tiny click area */}
         <div
-          className={`absolute top-32 left-16 w-32 h-32 cursor-pointer transition-all duration-300 hover:scale-110 ${clickEffects['security-camera'] ? 'animate-pulse' : ''}`}
+          className={`absolute top-16 left-4 sm:top-32 sm:left-16 w-16 h-16 sm:w-32 sm:h-32 cursor-pointer transition-all duration-300 hover:scale-110 touch-target ${clickEffects['security-camera'] ? 'animate-pulse' : ''}`}
           onClick={() => handleImageClick('security-camera')}
         >
           <Image
@@ -521,20 +521,20 @@ export default function TheatrePage() {
             className="object-contain"
           />
           {clickEffects['security-camera'] && (
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white text-xs">
-              <Camera className="w-3 h-3" />
-              <span>Recording...</span>
+            <div className="absolute -bottom-6 sm:-bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-1 sm:gap-2 text-white text-xs">
+              <Camera className="w-2 h-2 sm:w-3 sm:h-3" />
+              <span className="text-xs">Recording...</span>
             </div>
           )}
         </div>
 
       </div>
 
-      <div className="mt-12 text-center relative">
-        <h1 className="text-4xl font-bold text-white mb-4 text-balance">
+      <div className="mt-8 sm:mt-12 text-center relative px-4">
+        <h1 className="text-2xl sm:text-4xl font-bold text-white mb-3 sm:mb-4 text-balance">
           {showPianoBackground ? "🎹 Piano Mystery Unlocked!" : "Welcome to the Theatre"}
         </h1>
-        <p className="text-white/80 text-lg">
+        <p className="text-white/80 text-sm sm:text-lg">
           {showPianoBackground
             ? `Clues revealed: ${revealedBrokenImages.size}/3. Click the hidden images in sequence!`
             : "You found the secret performance hall!"
@@ -543,11 +543,11 @@ export default function TheatrePage() {
 
         {/* Sequence Progress Indicator */}
         {showPianoBackground && (
-          <div className="mt-4 flex justify-center gap-2">
+          <div className="mt-3 sm:mt-4 flex justify-center gap-1 sm:gap-2">
             {[1, 2, 3].map((num) => (
               <div
                 key={num}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                   revealedBrokenImages.has(num)
                     ? 'bg-green-400 scale-125'
                     : currentSequenceStep + 1 >= num
@@ -563,25 +563,25 @@ export default function TheatrePage() {
 
       {/* Detective Greeting Popup */}
       {showGreeting && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="glass rounded-3xl p-8 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500 pointer-events-auto">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="text-6xl">🕵️</div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none p-4">
+          <div className="glass rounded-3xl p-4 sm:p-8 max-w-md w-full animate-in fade-in slide-in-from-bottom-4 duration-500 pointer-events-auto">
+            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+              <div className="text-4xl sm:text-6xl">🕵️</div>
               <div>
-                <h2 className="text-3xl font-bold text-white mb-2">AHA!</h2>
-                <p className="text-xl text-white/90">Welcome, Detective!</p>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2">AHA!</h2>
+                <p className="text-lg sm:text-xl text-white/90">Welcome, Detective!</p>
               </div>
             </div>
-            <div className="text-white/80 space-y-2">
+            <div className="text-white/80 space-y-2 text-sm sm:text-base">
               <p>I'm <strong className="text-white">Inspector Gemini</strong>, and I need your help!</p>
               <p>Something mysterious is happening in this theatre...</p>
-              <p className="text-sm text-white/60 mt-4">
+              <p className="text-xs sm:text-sm text-white/60 mt-3 sm:mt-4">
                 💡 Click around to investigate, and chat with me if you need assistance!
               </p>
             </div>
             <button
               onClick={() => setShowGreeting(false)}
-              className="mt-4 w-full bg-white/20 hover:bg-white/30 rounded-xl px-4 py-2 text-white transition-all duration-300"
+              className="mt-3 sm:mt-4 w-full bg-white/20 hover:bg-white/30 rounded-xl px-4 py-2 text-white transition-all duration-300 touch-target"
             >
               Let's solve this mystery! 🔍
             </button>

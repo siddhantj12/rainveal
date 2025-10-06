@@ -119,7 +119,7 @@ export function WeatherDashboard() {
   })
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl">
       {isRaining && (
         <div className="fixed inset-0 z-50 pointer-events-none">
           <div className="rain-container">
@@ -137,44 +137,44 @@ export function WeatherDashboard() {
       {showRoamingCloud && !isRaining && (
         <button
           onClick={handleRoamingCloudClick}
-          className="fixed roaming-cloud z-40 cursor-pointer hover:scale-110 transition-transform"
+          className="fixed roaming-cloud z-40 cursor-pointer hover:scale-110 transition-transform touch-target"
           aria-label="Secret roaming cloud"
         >
-          <Cloud className="w-32 h-32 text-white/60 drop-shadow-lg" />
+          <Cloud className="w-16 h-16 sm:w-32 sm:h-32 text-white/60 drop-shadow-lg" />
         </button>
       )}
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
         <LocationSearch currentLocation={location} onLocationChange={setLocation} />
 
         <button
           onClick={handleCloudClick}
-          className="glass rounded-2xl px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 group"
+          className="glass rounded-2xl px-3 sm:px-4 py-2 text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-2 group touch-target w-full sm:w-auto"
           aria-label="Click the cloud"
         >
-          <Cloud className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span className="text-sm">Click me!</span>
+          <Cloud className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
+          <span className="text-xs sm:text-sm">Click me!</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="glass rounded-3xl p-8 text-white">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="glass rounded-3xl p-4 sm:p-8 text-white">
             <div className="flex items-center gap-2 mb-4">
-              <MapPin className="w-5 h-5" />
-              <span className="text-lg font-medium">{weather.location.name}</span>
-              <ChevronRight className="w-5 h-5" />
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-base sm:text-lg font-medium">{weather.location.name}</span>
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
 
-            <div className="mb-6">
-              <h2 className="text-6xl md:text-8xl font-bold mb-2">{Math.round(weather.current.temp)}°C</h2>
-              <p className="text-3xl font-light mb-2 capitalize">{weather.current.description}</p>
-              <p className="text-lg text-white/80">{currentDate}</p>
-              <p className="text-lg text-white/80">{currentTime}</p>
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-4xl sm:text-6xl md:text-8xl font-bold mb-2">{Math.round(weather.current.temp)}°C</h2>
+              <p className="text-xl sm:text-3xl font-light mb-2 capitalize">{weather.current.description}</p>
+              <p className="text-sm sm:text-lg text-white/80">{currentDate}</p>
+              <p className="text-sm sm:text-lg text-white/80">{currentTime}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <WeatherCard
               icon={<Droplets className="w-5 h-5" />}
               title="PRECIPITATION"
@@ -205,15 +205,15 @@ export function WeatherDashboard() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <WeatherCard
-              icon={<Sunrise className="w-5 h-5" />}
+              icon={<Sunrise className="w-4 h-4 sm:w-5 sm:h-5" />}
               title="SUNRISE"
               value={weather.current.sunrise}
               subtitle=""
             />
             <WeatherCard
-              icon={<Sunset className="w-5 h-5" />}
+              icon={<Sunset className="w-4 h-4 sm:w-5 sm:h-5" />}
               title="SUNSET"
               value={weather.current.sunset}
               subtitle=""
